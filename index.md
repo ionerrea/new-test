@@ -4,10 +4,10 @@ layout: page
 
 ![A test image](img/banner.png)
 
-The [Donostia International Physics Center (DIPC)](http://dipc.ehu.es) is organizing the Machine Learning in Condensed Matter Physics course on 26-28 August 2019. This 3 days course will cover the role and application of machine learning in condensed matter physics. In particular we will study machine learning techniques for studying classical and quantum many-body problems encountered in condensed matter, quantum information, and related fields of physics. 
+The stochastic self-consistent harmonic approximation (SSCHA) is a full computational python package that simulates thermodynamic and phononic properties of materials accounting for anharmonicity at a nonperturbative level that  fully including quantum and thermal fluctuations.
 
-Lectures, given by world leaders researchers on the topic, will emphasize relations between statistical physics and machine learning and will include slides, blackboard and hands-on code demonstrations using Julia and Python together with TensorFlow and PyTorch libraries. 
+If you are simulating transport or thermal properties of materials, phase diagrams, or phonon-related properties, then you need the SSCHA code. The method is based on a full-quantum variational method that optimizes the nuclear wave-functions (or density matrix at finite temperature) to minimize the free energy. In this way it can be used to calculate thermodynamic properties of strongly anharmonic systems and the conditions at which first- and second-order phases occur, estimate the phonon frequencies expected experimentally, obtain spectral functions, phonon lifetimes, determine the structural changes imposed by quantum effects, and so on.  
 
-Attendants are expected to bring their own laptops with a pre-configured environment (specific instructions will be given).
+The SSCHA comes both as a python library that can be runned inside your own workflows and as a stand-alone software, which is initialized by input files with the same syntax as Quantum ESPRESSO. It can be coupled with any *ab initio* engine for force and energy calculations, or it can also be used with force fields. It can interact through the Atomic Simulation Environment (ASE), and has an implemented interface for automatic submission of jobs in a remote cluster.
 
-This course is a satellite event to the [Topological Matter School 2019](https://tms-dipc.org/), due on August 19-23 2019, and also organized by the DIPC as part of the [University Of the Basque Country Summer Courses](https://www.uik.eus/en).
+In this website you can find the instructions to install the code and Tutorials that will help you understand how to use it.
