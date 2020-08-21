@@ -1,4 +1,9 @@
-# How to install
+---
+layout: page
+title: Download and Installation
+---
+
+## Download
 
 ## Requirements
 
