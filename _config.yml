@@ -3,7 +3,7 @@
 # Name of website
 title: SSCHA
 # Short description of your site
-description: Summer Course
+description: The Stochastic Self-Consistent Harmonic Approximation
 
 # --- Local development options ---
 # If your website is hosted locally rather than on GitHub, then you need to uncomment the next two parameters to set the url and baseurl
@@ -13,7 +13,7 @@ description: Summer Course
 #url: "https://example.com"
 
 # baseurl should be an empty string
-baseurl: ""
+#baseurl: ""
 
 # --- Navigation bar options --- #
 
