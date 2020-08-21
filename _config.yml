@@ -1,8 +1,7 @@
 # --- General options --- #
 
 # Name of website
-title: Machine Learning in<br>Condensed Matter Physics 2019
-
+title: SSCHA
 # Short description of your site
 description: Summer Course
 
@@ -14,21 +13,24 @@ description: Summer Course
 #url: "https://example.com"
 
 # baseurl should be an empty string
-baseurl: "/ML-CM-2019"
+baseurl: ""
 
 # --- Navigation bar options --- #
 
 # List of links in the navigation bar
 navbar-links:
-  Speakers: "speakers"
-  Organizers: "organizers"
+  Developers: "developers"
   News: "news"
-  Resources:
-    - Programme: "programme"
-    - Materials: "materials"
-    - Software setup: "software-setup"  
-    - Venue: "venue"
-    - Registration: "registration"
+  Donwload and installation: "download"
+  Manual: "manual"
+  Faqs: "faqs"
+  Tutorials:
+    - Lead telluride: "/Tutorials/pbte"
+    - Sulfur hydride: "/Tutorials/H3S"
+    - Lanthanum hydride: "/Tutorials/LaH10" 
+  Refernces and how to cite: "references"
+  Contact: "contact"
+
 
 # Image to show in the navigation bar - image must be a square (width = height)
 # Remove this parameter if you don't want an image in the navbar
@@ -65,17 +67,17 @@ footer-link-col: "#404040"
 # Change all these values or delete the ones you don't want.
 # Important: you must keep the "name" parameter, everything else you can remove
 author:
-  name: DIPC
+  name: Ion Errea
 
 # Select your active Social Network Links.
 # Uncomment the links you want to show in the footer and add your information to each link.
 # You can reorder the items to define the link order.
 # If you want to add a new link that isn't here, you'll need to also edit the file _data/SocialNetworks.yml
 social-network-links:
-  rss: true
-  email: "tms@dipc.org"
+#  rss: true
+#  email: "tms@dipc.org"
 #  facebook: deanattali
-  github: iamc/ML-CM-2019
+#  github: iamc/ML-CM-2019
 #  twitter: daattali
 #  reddit: yourname
 #  linkedin: daattali
@@ -98,7 +100,7 @@ share-links-active:
 
 # How to display the link to the website in the footer
 # Remove this if you don't want a link in the footer
-url-pretty: "iamc.eu/ML-CM-2019"  # eg. "deanattali.com/beautiful-jekyll"
+url-pretty: "sscha.eu"  # eg. "deanattali.com/beautiful-jekyll"
 
 # --- Web Statistics Section --- #
 
