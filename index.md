@@ -1,7 +1,5 @@
 ---
 layout: page
-title: Machine Learning in Condensed Matter Physics
-subtitle: Donostia - San Sebastian, 26-28 August 2019
 bigimg: "img/banner.png"
 ---
 
