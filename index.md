@@ -1,6 +1,5 @@
 ---
 layout: page
-bigimg: "img/banner.png"
 ---
 
 ![A test image](img/banner.png)
