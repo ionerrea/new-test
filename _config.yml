@@ -13,7 +13,7 @@ description: The Stochastic Self-Consistent Harmonic Approximation
 #url: "https://example.com"
 
 # baseurl should be an empty string
-#baseurl: ""
+baseurl: "/new-test"
 
 # --- Navigation bar options --- #
 
