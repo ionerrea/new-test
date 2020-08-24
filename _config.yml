@@ -23,7 +23,7 @@ navbar-links:
   Developers: "developers"
   News: "news"
   Donwload and installation: "download"
-  User guide: "userguide"
+  User guide: "/userguide/index1"
   Faqs: "faqs"
   Tutorials:
     - Lead telluride: "/Tutorials/pbte"
