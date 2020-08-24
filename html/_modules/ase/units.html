@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>ase.units &#8212; python-sscha 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ase.units</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;ase.units</span>
+
+<span class="sd">Physical constants and units derived from CODATA for converting</span>
+<span class="sd">to and from ase internal units.</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span><span class="p">,</span> <span class="n">sqrt</span>
+
+
+<span class="c1"># the version we actually use</span>
+<span class="n">__codata_version__</span> <span class="o">=</span> <span class="s1">&#39;2014&#39;</span>
+
+
+<span class="c1"># Instead of a plain dict, if the units are in the __dict__ of a</span>
+<span class="c1"># dict subclass, they can be accessed as attributes in a similar way</span>
+<span class="c1"># to a module.</span>
+<span class="k">class</span> <span class="nc">Units</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dictionary for units that supports .attribute access.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Units</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="bp">self</span>
+
+
+<span class="c1"># this is the hard-coded CODATA values</span>
+<span class="c1"># all other units are dynamically derived from these values upon import of the</span>
+<span class="c1"># module</span>
+<span class="n">CODATA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># the &quot;original&quot; CODATA version ase used ever since</span>
+    <span class="c1"># Constants from Konrad Hinsen&#39;s PhysicalQuantities module (1986 CODATA)</span>
+    <span class="c1"># Add the constant pi used to define the mu0 and hbar here for reference</span>
+    <span class="c1"># as well</span>
+    <span class="s1">&#39;1986&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_c&#39;</span><span class="p">:</span> <span class="mf">299792458.</span><span class="p">,</span>              <span class="c1"># speed of light, m/s</span>
+             <span class="s1">&#39;_mu0&#39;</span><span class="p">:</span> <span class="mf">4.e-7</span> <span class="o">*</span> <span class="n">pi</span><span class="p">,</span>            <span class="c1"># permeability of vacuum</span>
+             <span class="s1">&#39;_Grav&#39;</span><span class="p">:</span> <span class="mf">6.67259e-11</span><span class="p">,</span>          <span class="c1"># gravitational constant</span>
+             <span class="s1">&#39;_hplanck&#39;</span><span class="p">:</span> <span class="mf">6.6260755e-34</span><span class="p">,</span>     <span class="c1"># Planck constant, J s</span>
+             <span class="s1">&#39;_e&#39;</span><span class="p">:</span> <span class="mf">1.60217733e-19</span><span class="p">,</span>          <span class="c1"># elementary charge</span>
+             <span class="s1">&#39;_me&#39;</span><span class="p">:</span> <span class="mf">9.1093897e-31</span><span class="p">,</span>          <span class="c1"># electron mass</span>
+             <span class="s1">&#39;_mp&#39;</span><span class="p">:</span> <span class="mf">1.6726231e-27</span><span class="p">,</span>          <span class="c1"># proton mass</span>
+             <span class="s1">&#39;_Nav&#39;</span><span class="p">:</span> <span class="mf">6.0221367e23</span><span class="p">,</span>          <span class="c1"># Avogadro number</span>
+             <span class="s1">&#39;_k&#39;</span><span class="p">:</span> <span class="mf">1.380658e-23</span><span class="p">,</span>            <span class="c1"># Boltzmann constant, J/K</span>
+             <span class="s1">&#39;_amu&#39;</span><span class="p">:</span> <span class="mf">1.6605402e-27</span><span class="p">},</span>         <span class="c1"># atomic mass unit, kg</span>
+
+    <span class="c1"># CODATA 1998 taken from</span>
+    <span class="c1"># http://dx.doi.org/10.1103/RevModPhys.72.351</span>
+    <span class="s1">&#39;1998&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_c&#39;</span><span class="p">:</span> <span class="mf">299792458.</span><span class="p">,</span>
+             <span class="s1">&#39;_mu0&#39;</span><span class="p">:</span> <span class="mf">4.0e-7</span> <span class="o">*</span> <span class="n">pi</span><span class="p">,</span>
+             <span class="s1">&#39;_Grav&#39;</span><span class="p">:</span> <span class="mf">6.673e-11</span><span class="p">,</span>
+             <span class="s1">&#39;_hplanck&#39;</span><span class="p">:</span> <span class="mf">6.62606876e-34</span><span class="p">,</span>
+             <span class="s1">&#39;_e&#39;</span><span class="p">:</span> <span class="mf">1.602176462e-19</span><span class="p">,</span>
+             <span class="s1">&#39;_me&#39;</span><span class="p">:</span> <span class="mf">9.10938188e-31</span><span class="p">,</span>
+             <span class="s1">&#39;_mp&#39;</span><span class="p">:</span> <span class="mf">1.67262158e-27</span><span class="p">,</span>
+             <span class="s1">&#39;_Nav&#39;</span><span class="p">:</span> <span class="mf">6.02214199e23</span><span class="p">,</span>
+             <span class="s1">&#39;_k&#39;</span><span class="p">:</span> <span class="mf">1.3806503e-23</span><span class="p">,</span>
+             <span class="s1">&#39;_amu&#39;</span><span class="p">:</span> <span class="mf">1.66053873e-27</span><span class="p">},</span>
+
+    <span class="c1"># CODATA 2002 taken from</span>
+    <span class="c1"># http://dx.doi.org/10.1103/RevModPhys.77.1</span>
+    <span class="s1">&#39;2002&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_c&#39;</span><span class="p">:</span> <span class="mf">299792458.</span><span class="p">,</span>
+             <span class="s1">&#39;_mu0&#39;</span><span class="p">:</span> <span class="mf">4.0e-7</span> <span class="o">*</span> <span class="n">pi</span><span class="p">,</span>
+             <span class="s1">&#39;_Grav&#39;</span><span class="p">:</span> <span class="mf">6.6742e-11</span><span class="p">,</span>
+             <span class="s1">&#39;_hplanck&#39;</span><span class="p">:</span> <span class="mf">6.6260693e-34</span><span class="p">,</span>
+             <span class="s1">&#39;_e&#39;</span><span class="p">:</span> <span class="mf">1.60217653e-19</span><span class="p">,</span>
+             <span class="s1">&#39;_me&#39;</span><span class="p">:</span> <span class="mf">9.1093826e-31</span><span class="p">,</span>
+             <span class="s1">&#39;_mp&#39;</span><span class="p">:</span> <span class="mf">1.67262171e-27</span><span class="p">,</span>
+             <span class="s1">&#39;_Nav&#39;</span><span class="p">:</span> <span class="mf">6.0221415e23</span><span class="p">,</span>
+             <span class="s1">&#39;_k&#39;</span><span class="p">:</span> <span class="mf">1.3806505e-23</span><span class="p">,</span>
+             <span class="s1">&#39;_amu&#39;</span><span class="p">:</span> <span class="mf">1.66053886e-27</span><span class="p">},</span>
+
+    <span class="c1"># CODATA 2006 taken from</span>
+    <span class="c1"># http://dx.doi.org/10.1103/RevModPhys.80.633</span>
+    <span class="s1">&#39;2006&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_c&#39;</span><span class="p">:</span> <span class="mf">299792458.</span><span class="p">,</span>
+             <span class="s1">&#39;_mu0&#39;</span><span class="p">:</span> <span class="mf">4.0e-7</span> <span class="o">*</span> <span class="n">pi</span><span class="p">,</span>
+             <span class="s1">&#39;_Grav&#39;</span><span class="p">:</span> <span class="mf">6.67428e-11</span><span class="p">,</span>
+             <span class="s1">&#39;_hplanck&#39;</span><span class="p">:</span> <span class="mf">6.62606896e-34</span><span class="p">,</span>
+             <span class="s1">&#39;_e&#39;</span><span class="p">:</span> <span class="mf">1.602176487e-19</span><span class="p">,</span>
+             <span class="s1">&#39;_me&#39;</span><span class="p">:</span> <span class="mf">9.10938215e-31</span><span class="p">,</span>
+             <span class="s1">&#39;_mp&#39;</span><span class="p">:</span> <span class="mf">1.672621637e-27</span><span class="p">,</span>
+             <span class="s1">&#39;_Nav&#39;</span><span class="p">:</span> <span class="mf">6.02214179e23</span><span class="p">,</span>
+             <span class="s1">&#39;_k&#39;</span><span class="p">:</span> <span class="mf">1.3806504e-23</span><span class="p">,</span>
+             <span class="s1">&#39;_amu&#39;</span><span class="p">:</span> <span class="mf">1.660538782e-27</span><span class="p">},</span>
+
+    <span class="c1"># CODATA 2010 taken from</span>
+    <span class="c1"># http://dx.doi.org/10.1103/RevModPhys.84.1527</span>
+    <span class="s1">&#39;2010&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_c&#39;</span><span class="p">:</span> <span class="mf">299792458.</span><span class="p">,</span>
+             <span class="s1">&#39;_mu0&#39;</span><span class="p">:</span> <span class="mf">4.0e-7</span> <span class="o">*</span> <span class="n">pi</span><span class="p">,</span>
+             <span class="s1">&#39;_Grav&#39;</span><span class="p">:</span> <span class="mf">6.67384e-11</span><span class="p">,</span>
+             <span class="s1">&#39;_hplanck&#39;</span><span class="p">:</span> <span class="mf">6.62606957e-34</span><span class="p">,</span>
+             <span class="s1">&#39;_e&#39;</span><span class="p">:</span> <span class="mf">1.602176565e-19</span><span class="p">,</span>
+             <span class="s1">&#39;_me&#39;</span><span class="p">:</span> <span class="mf">9.10938291e-31</span><span class="p">,</span>
+             <span class="s1">&#39;_mp&#39;</span><span class="p">:</span> <span class="mf">1.672621777e-27</span><span class="p">,</span>
+             <span class="s1">&#39;_Nav&#39;</span><span class="p">:</span> <span class="mf">6.02214129e23</span><span class="p">,</span>
+             <span class="s1">&#39;_k&#39;</span><span class="p">:</span> <span class="mf">1.3806488e-23</span><span class="p">,</span>
+             <span class="s1">&#39;_amu&#39;</span><span class="p">:</span> <span class="mf">1.660538921e-27</span><span class="p">},</span>
+
+    <span class="c1"># CODATA 2014 taken from</span>
+    <span class="c1"># http://arxiv.org/pdf/1507.07956.pdf</span>
+    <span class="s1">&#39;2014&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_c&#39;</span><span class="p">:</span> <span class="mf">299792458.</span><span class="p">,</span>
+             <span class="s1">&#39;_mu0&#39;</span><span class="p">:</span> <span class="mf">4.0e-7</span> <span class="o">*</span> <span class="n">pi</span><span class="p">,</span>
+             <span class="s1">&#39;_Grav&#39;</span><span class="p">:</span> <span class="mf">6.67408e-11</span><span class="p">,</span>
+             <span class="s1">&#39;_hplanck&#39;</span><span class="p">:</span> <span class="mf">6.626070040e-34</span><span class="p">,</span>
+             <span class="s1">&#39;_e&#39;</span><span class="p">:</span> <span class="mf">1.6021766208e-19</span><span class="p">,</span>
+             <span class="s1">&#39;_me&#39;</span><span class="p">:</span> <span class="mf">9.10938356e-31</span><span class="p">,</span>
+             <span class="s1">&#39;_mp&#39;</span><span class="p">:</span> <span class="mf">1.672621898e-27</span><span class="p">,</span>
+             <span class="s1">&#39;_Nav&#39;</span><span class="p">:</span> <span class="mf">6.022140857e23</span><span class="p">,</span>
+             <span class="s1">&#39;_k&#39;</span><span class="p">:</span> <span class="mf">1.38064852e-23</span><span class="p">,</span>
+             <span class="s1">&#39;_amu&#39;</span><span class="p">:</span> <span class="mf">1.660539040e-27</span><span class="p">}}</span>
+
+
+<span class="k">def</span> <span class="nf">create_units</span><span class="p">(</span><span class="n">codata_version</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function that creates a dictionary containing all units previously hard</span>
+<span class="sd">    coded in ase.units depending on a certain CODATA version. Note that</span>
+<span class="sd">    returned dict has attribute access it can be used in place of the module</span>
+<span class="sd">    or to update your local or global namespace.</span>
+
+<span class="sd">    Parameters:</span>
+
+<span class="sd">    codata_version: str</span>
+<span class="sd">        The CODATA version to be used. Implemented are</span>
+
+<span class="sd">        * &#39;1986&#39;</span>
+<span class="sd">        * &#39;1998&#39;</span>
+<span class="sd">        * &#39;2002&#39;</span>
+<span class="sd">        * &#39;2006&#39;</span>
+<span class="sd">        * &#39;2010&#39;</span>
+<span class="sd">        * &#39;2014&#39;</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    units: dict</span>
+<span class="sd">        Dictionary that contains all formerly hard coded variables from</span>
+<span class="sd">        ase.units as key-value pairs. The dict supports attribute access.</span>
+
+<span class="sd">    Raises:</span>
+
+<span class="sd">    NotImplementedError</span>
+<span class="sd">        If the required CODATA version is not known.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">Units</span><span class="p">(</span><span class="n">CODATA</span><span class="p">[</span><span class="n">codata_version</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;CODATA version &quot;</span><span class="si">{0}</span><span class="s1">&quot; not implemented&#39;</span>
+                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">__codata_version__</span><span class="p">))</span>
+
+    <span class="c1"># derived from the CODATA values</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_eps0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_mu0&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_c&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># permittivity of vacuum</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hbar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hplanck&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span><span class="p">)</span>  <span class="c1"># Planck constant / 2pi, J s</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Ang&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Angstrom&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;nm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Bohr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4e10</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_eps0&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hbar&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span>
+                 <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_me&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Bohr radius</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;eV&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Hartree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;_me&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">16</span> <span class="o">/</span> <span class="n">pi</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span>
+                    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_eps0&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hbar&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;kJ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.0</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;kcal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.184</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;kJ&#39;</span><span class="p">]</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;mol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_Nav&#39;</span><span class="p">]</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Rydberg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Hartree&#39;</span><span class="p">]</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Ry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Rydberg&#39;</span><span class="p">]</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Ha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Hartree&#39;</span><span class="p">]</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e10</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_amu&#39;</span><span class="p">])</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;fs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-15</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;kB&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_k&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span>  <span class="c1"># Boltzmann constant, eV/K</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Pascal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e30</span>  <span class="c1"># J/m^3</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;GPa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e9</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Pascal&#39;</span><span class="p">]</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Debye&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">1e11</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_c&#39;</span><span class="p">]</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_eps0&#39;</span><span class="p">])</span> <span class="o">/</span>
+                  <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hbar&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_c&#39;</span><span class="p">])</span>  <span class="c1"># fine structure constant</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;invcm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_c&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hplanck&#39;</span><span class="p">]</span> <span class="o">/</span>
+                  <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">])</span>  <span class="c1"># cm^-1 energy unit</span>
+
+    <span class="c1"># Derived atomic units that have no assigned name:</span>
+    <span class="c1"># atomic unit of time, s:</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_aut&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hbar&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_me&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_c&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># atomic unit of velocity, m/s:</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_auv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hbar&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_eps0&#39;</span><span class="p">])</span>
+    <span class="c1"># atomic unit of force, N:</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_auf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_me&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_c&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hbar&#39;</span><span class="p">]</span>
+    <span class="c1"># atomic unit of pressure, Pa:</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_aup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">5</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_me&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_c&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">5</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_hbar&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;AUT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_aut&#39;</span><span class="p">]</span>
+
+    <span class="c1"># SI units</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e10</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;Ang&#39;</span><span class="p">]</span>  <span class="c1"># metre</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;kg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_amu&#39;</span><span class="p">]</span>  <span class="c1"># kilogram</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]</span>  <span class="c1"># second</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">]</span>  <span class="c1"># ampere</span>
+    <span class="c1"># derived</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;J&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;kJ&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span>  <span class="c1"># Joule = kg * m**2 / s**2</span>
+    <span class="n">u</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;_e&#39;</span><span class="p">]</span>  <span class="c1"># Coulomb = A * s</span>
+
+    <span class="k">return</span> <span class="n">u</span>
+
+
+<span class="c1"># Define all the expected symbols with dummy values so that introspection</span>
+<span class="c1"># will know that they exist when the module is imported, even though their</span>
+<span class="c1"># values are immediately overwritten.</span>
+<span class="c1"># pylint: disable=invalid-name</span>
+<span class="p">(</span><span class="n">_Grav</span><span class="p">,</span> <span class="n">_Nav</span><span class="p">,</span> <span class="n">_amu</span><span class="p">,</span> <span class="n">_auf</span><span class="p">,</span> <span class="n">_aup</span><span class="p">,</span> <span class="n">_aut</span><span class="p">,</span> <span class="n">_auv</span><span class="p">,</span> <span class="n">_c</span><span class="p">,</span> <span class="n">_e</span><span class="p">,</span> <span class="n">_eps0</span><span class="p">,</span>
+ <span class="n">_hbar</span><span class="p">,</span> <span class="n">_hplanck</span><span class="p">,</span> <span class="n">_k</span><span class="p">,</span> <span class="n">_me</span><span class="p">,</span> <span class="n">_mp</span><span class="p">,</span> <span class="n">_mu0</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">eV</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">invcm</span><span class="p">,</span>
+ <span class="n">kB</span><span class="p">,</span> <span class="n">kJ</span><span class="p">,</span> <span class="n">kcal</span><span class="p">,</span> <span class="n">kg</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">nm</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">AUT</span><span class="p">,</span> <span class="n">Ang</span><span class="p">,</span> <span class="n">Angstrom</span><span class="p">,</span>
+ <span class="n">Bohr</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Debye</span><span class="p">,</span> <span class="n">GPa</span><span class="p">,</span> <span class="n">Ha</span><span class="p">,</span> <span class="n">Hartree</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Pascal</span><span class="p">,</span> <span class="n">Ry</span><span class="p">,</span> <span class="n">Rydberg</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">43</span>
+
+<span class="c1"># Now update the module scope:</span>
+<span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">create_units</span><span class="p">(</span><span class="n">__codata_version__</span><span class="p">))</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index1.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Lorenzo Monacelli.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

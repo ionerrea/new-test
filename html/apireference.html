@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>THE API &#8212; python-sscha 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Frequently Asked Questions (FAQs)" href="faq.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="the-api">
+<h1>THE API<a class="headerlink" href="#the-api" title="Permalink to this headline">¶</a></h1>
+<p>This chapter contains the documentations for the main methods of the python-sscha code.
+It can be used both from advanced users, that wants to exploit python-sscha as a library,
+or developers, willing to add new features to the code (or adapt existing ones for their own purpouses).</p>
+<p>The API is divided in Modules.</p>
+<div class="section" id="the-ensemble-module">
+<h2>The Ensemble Module<a class="headerlink" href="#the-ensemble-module" title="Permalink to this headline">¶</a></h2>
+<p>This module deals with ensembles of configurations.
+It is used to generate random configurations from the dynamical matrix, to compute observables on the ensemble used in the SSCHA optimization.
+These includes the average force on atoms, the gradient of the SSCHA minimization, the quantum-thermal stress tensor, as well as properties of
+the ensemble, like reweighting.</p>
+</div>
+<div class="section" id="the-schaminimizer-module">
+<h2>The SchaMinimizer Module<a class="headerlink" href="#the-schaminimizer-module" title="Permalink to this headline">¶</a></h2>
+<p>This module is the main SSCHA minimizer. It allows to setup a single (one population) minimization.
+In this module the minimization algorithm is introduced, as well as stopping conditions and all the parameters
+usually located in the &amp;inputscha namelist are read.</p>
+<span class="target" id="module-sscha.SchaMinimizer"></span><dl class="function">
+<dt id="sscha.SchaMinimizer.ApplyFCPrecond">
+<code class="sig-prename descclassname">sscha.SchaMinimizer.</code><code class="sig-name descname">ApplyFCPrecond</code><span class="sig-paren">(</span><em class="sig-param">current_dyn</em>, <em class="sig-param">matrix</em>, <em class="sig-param">T=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sscha/SchaMinimizer.html#ApplyFCPrecond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sscha.SchaMinimizer.ApplyFCPrecond" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function perform the precondition on a given matrix, by applying
+the inverse of the lambda function</p>
+<blockquote>
+<div><dl class="simple">
+<dt>current_dyn<span class="classifier">3*nat x 3*nat</span></dt><dd><p>The current force-constant matrix to compute the Lambda tensor</p>
+</dd>
+<dt>matrix<span class="classifier">3*nat x 3*nat</span></dt><dd><p>The matrix on which you want to apply the Lambda tensor.</p>
+</dd>
+<dt>T<span class="classifier">float</span></dt><dd><p>The temperature</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>new_matrix<span class="classifier">3*nat x 3*nat</span></dt><dd><p>The matrix after the Lambda application</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="sscha.SchaMinimizer.ApplyLambdaTensor">
+<code class="sig-prename descclassname">sscha.SchaMinimizer.</code><code class="sig-name descname">ApplyLambdaTensor</code><span class="sig-paren">(</span><em class="sig-param">current_dyn</em>, <em class="sig-param">matrix</em>, <em class="sig-param">T=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sscha/SchaMinimizer.html#ApplyLambdaTensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sscha.SchaMinimizer.ApplyLambdaTensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function perform the inverse of the precondtioning: it applies the Hessian
+matrix to the preconditioned gradient to obtain the real one. This is
+a test function.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>current_dyn<span class="classifier">3*nat x 3*nat</span></dt><dd><p>The current force-constant matrix to compute the Lambda tensor</p>
+</dd>
+<dt>matrix<span class="classifier">3*nat x 3*nat</span></dt><dd><p>The matrix on which you want to apply the Lambda tensor.</p>
+</dd>
+<dt>T<span class="classifier">float</span></dt><dd><p>The temperature</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>new_matrix<span class="classifier">3*nat x 3*nat</span></dt><dd><p>The matrix after the Lambda application</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="sscha.SchaMinimizer.GetBestWykoffStep">
+<code class="sig-prename descclassname">sscha.SchaMinimizer.</code><code class="sig-name descname">GetBestWykoffStep</code><span class="sig-paren">(</span><em class="sig-param">current_dyn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sscha/SchaMinimizer.html#GetBestWykoffStep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sscha.SchaMinimizer.GetBestWykoffStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an alternative way to the preconditioning, in which the best wyckoff step
+is choosen rescaled on the current dynamical matrix.</p>
+<p>NOTE: It works with real space matrices.</p>
+<div class="math notranslate nohighlight">
+\[STEP = \frac{1}{\max \lambda(\Phi)}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(\lambda(\Phi)\)</span> is the generic eigenvalue of the force constant matrix.
+This is because <span class="math notranslate nohighlight">\(\Phi\)</span> is correct Hessian of the free energy respect to
+the structure in the minimum.</p>
+<p>The best step is returned in [Angstrom^2 / Ry].</p>
+<blockquote>
+<div><dl class="simple">
+<dt>current_dyn<span class="classifier">ndarray 3n_at x 3n_at</span></dt><dd><p>The force constant matrix <span class="math notranslate nohighlight">\(\Phi\)</span>. It should be in Ry/bohr^2.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="sscha.SchaMinimizer.GetStructPrecond">
+<code class="sig-prename descclassname">sscha.SchaMinimizer.</code><code class="sig-name descname">GetStructPrecond</code><span class="sig-paren">(</span><em class="sig-param">current_dyn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sscha/SchaMinimizer.html#GetStructPrecond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sscha.SchaMinimizer.GetStructPrecond" title="Permalink to this definition">¶</a></dt>
+<dd><p>NOTE: the Phi is in Ry/bohr^2 while the forces are in Ry/A
+NOTE: the output preconditioner (that must be interfaced with forces) is in A^2/Ry</p>
+<p>The preconditioner of the structure minimization is computed directly from the
+dynamical matrix. It is the fake inverse (projected out the translations).</p>
+<div class="math notranslate nohighlight">
+\[\Phi_{\alpha\beta}^{-1} = \frac{1}{\sqrt{M_\alpha M_\beta}}\sum_\mu \frac{e_\mu^\alpha e_\mu^\beta}{\omega_\mu^2}\]</div>
+<p>Where the sum is restricted to the non translational modes.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>current_dyn<span class="classifier">Phonons()</span></dt><dd><p>The current dynamical matrix</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>preconditioner<span class="classifier">ndarray 3nat x 3nat</span></dt><dd><p>The inverse of the force constant matrix, it can be used as a preconditioner.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="sscha.SchaMinimizer.PerformRootStep">
+<code class="sig-prename descclassname">sscha.SchaMinimizer.</code><code class="sig-name descname">PerformRootStep</code><span class="sig-paren">(</span><em class="sig-param">dyn_q</em>, <em class="sig-param">grad_q</em>, <em class="sig-param">step_size=1</em>, <em class="sig-param">root_representation='sqrt'</em>, <em class="sig-param">minimization_algorithm='sdes'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sscha/SchaMinimizer.html#PerformRootStep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sscha.SchaMinimizer.PerformRootStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>As for the [Monacelli, Errea, Calandra, Mauri, PRB 2017], the nonlinear
+change of variable is used to perform the step.</p>
+<p>It works as follows:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\Phi \rightarrow \sqrt{x}{\Phi}\\\frac{\partial F}{\partial \Phi} \rightarrow \frac{\partial F}{\partial \sqrt{x}{\Phi}}\\\sqrt{x}{\Phi^{(n)}} \stackrel{\frac{\partial F}{\partial \sqrt{x}{\Phi}}}{\longrightarrow} \sqrt{x}{\Phi^{(n+1)}}\\\Phi^{(n+1)} = \left(\sqrt{x}{\Phi^{(n+1)}})^{x}\end{aligned}\end{align} \]</div>
+<p>Where the specific update step is determined by the minimization_algorithm, while the <span class="math notranslate nohighlight">\(x\)</span> order 
+of the root representation is determined by the root_representation argument.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dyn_q<span class="classifier">ndarray( NQ x 3nat x 3nat )</span></dt><dd><p>The dynamical matrix in q space. The Nq are the total number of q.</p>
+</dd>
+<dt>grad_q<span class="classifier">ndarray( NQ x 3nat x 3nat )</span></dt><dd><p>The gradient of the dynamical matrix.</p>
+</dd>
+<dt>step_size<span class="classifier">float</span></dt><dd><p>The step size for the minimization</p>
+</dd>
+<dt>root_representation<span class="classifier">string</span></dt><dd><p>choice between “normal”, “sqrt” and “root4”. The value of <span class="math notranslate nohighlight">\(x\)</span> will be, respectively,
+1, 2, 4.</p>
+</dd>
+<dt>minimization_algorithm<span class="classifier">string</span></dt><dd><p>The minimization algorithm to be used for the update.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>new_dyn_q<span class="classifier">ndarray( NQ x 3nat x 3nat )</span></dt><dd><p>The updated dynamical matrix in q space</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="sscha.SchaMinimizer.get_root_dyn">
+<code class="sig-prename descclassname">sscha.SchaMinimizer.</code><code class="sig-name descname">get_root_dyn</code><span class="sig-paren">(</span><em class="sig-param">dyn_fc</em>, <em class="sig-param">root_representation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sscha/SchaMinimizer.html#get_root_dyn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sscha.SchaMinimizer.get_root_dyn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the root dyn matrix</p>
+<p>This method computes the root equivalent of the dynamical matrix</p>
+</dd></dl>
+
+</div>
+<div class="section" id="the-relax-module">
+<h2>The Relax Module<a class="headerlink" href="#the-relax-module" title="Permalink to this headline">¶</a></h2>
+<p>This module deals with relaxations that are iterated over more populations. It includes the variable cell optimization algorithm.
+Here the parameters readed in the &amp;relax namelist are read and setup.</p>
+<span class="target" id="module-sscha.Relax"></span><dl class="function">
+<dt id="sscha.Relax.GetStaticBulkModulus">
+<code class="sig-prename descclassname">sscha.Relax.</code><code class="sig-name descname">GetStaticBulkModulus</code><span class="sig-paren">(</span><em class="sig-param">structure</em>, <em class="sig-param">ase_calculator</em>, <em class="sig-param">eps=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sscha/Relax.html#GetStaticBulkModulus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sscha.Relax.GetStaticBulkModulus" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method uses finite differences on the cell to compute
+the static bulk modulus. The cell is strained into several volumes,
+and the stress tensor is computed in orther to obtain the bulk modulus.
+Only the symmmetry relevant terms are computed.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>structure<span class="classifier">CC.Structure.Structure()</span></dt><dd><p>The structure on which you want to compute the static bulk modulus</p>
+</dd>
+<dt>ase_calculator<span class="classifier">ase.calculators.calculator.Calculator()</span></dt><dd><p>One of the ase calculators to get the stress tensor in several strained
+cells.</p>
+</dd>
+<dt>eps<span class="classifier">float</span></dt><dd><p>The strain module</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>bk_mod<span class="classifier">ndarray (9x9)</span></dt><dd><p>The bulk modulus as a 9x9 matrix, expressed in eV / A^3</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="the-cluster-module">
+<h2>The Cluster Module<a class="headerlink" href="#the-cluster-module" title="Permalink to this headline">¶</a></h2>
+<p>The Cluster module provide the interface between python-sscha and remote servers to witch you submit the energy and forces calculations.
+The input in &amp;cluster namespace is interpreted in this module</p>
+<span class="target" id="module-sscha.Cluster"></span><dl class="data">
+<dt id="sscha.Cluster.units">
+<code class="sig-prename descclassname">sscha.Cluster.</code><code class="sig-name descname">units</code><em class="property"> = {'A': 63541.72207603944, 'AUT': 0.002375996331368385, 'Ang': 1.0, 'Angstrom': 1.0, 'Bohr': 0.5291772083535413, 'C': 6.241509647120417e+18, 'Debye': 0.20819435181122592, 'GPa': 0.006241509647120417, 'Ha': 27.21138386556469, 'Hartree': 27.21138386556469, 'J': 6.241509647120418e+18, 'Pascal': 6.241509647120417e-12, 'Ry': 13.605691932782346, 'Rydberg': 13.605691932782346, '_Grav': 6.67428e-11, '_Nav': 6.02214179e+23, '_amu': 1.660538782e-27, '_auf': 8.238722061327264e-08, '_aup': 29421010848651.156, '_aut': 2.418884325704007e-17, '_auv': 2187691.2538987417, '_c': 299792458.0, '_e': 1.602176487e-19, '_eps0': 8.85418781762039e-12, '_hbar': 1.054571628251774e-34, '_hplanck': 6.62606896e-34, '_k': 1.3806504e-23, '_me': 9.10938215e-31, '_mp': 1.672621637e-27, '_mu0': 1.2566370614359173e-06, 'alpha': 0.007297352536796447, 'eV': 1.0, 'fs': 0.09822695141392761, 'invcm': 0.00012398418754199978, 'kB': 8.617342790900664e-05, 'kJ': 6.241509647120418e+21, 'kcal': 2.611447636355183e+22, 'kg': 6.022141794216764e+26, 'm': 10000000000.0, 'mol': 6.02214179e+23, 'nm': 10.0, 's': 98226951413927.6, 'second': 98226951413927.6}</em><a class="headerlink" href="#sscha.Cluster.units" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an untility script that is able to manage the submission into
+a cluster of an ensemble</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index1.html">Documentation overview</a><ul>
+      <li>Previous: <a href="faq.html" title="previous chapter">Frequently Asked Questions (FAQs)</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Lorenzo Monacelli.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/apireference.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>How to install &#8212; python-sscha 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quick start" href="start.html" />
+    <link rel="prev" title="Introduction" href="intro.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-install">
+<h1>How to install<a class="headerlink" href="#how-to-install" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>The requirements of the python-sscha package are:
+1. python &gt;= 2.7 and &lt; 3
+2. numpy
+3. matplotlib
+3. Lapack
+4. Blas
+5. gfortran (or any fortran compiler)
+6. CellConstructor</p>
+<p>Recommended packages:
+1. Atomic Simulation Environment (ASE)
+2. SPGLIB</p>
+<p>These packages are fundamental. In particular CellConstructor is the shoulder on
+which python-sscha is builded on. You can find the last development version on
+GitHub</p>
+<p>The ASE (Atomic Simulation Environment) is another dependency, since CellConstructor
+relies on it.</p>
+<p>To install all the dependences, simply run</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span>
+<span class="pre">`</span></code></p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>To install the package it is recommended the last version of anaconda-python2,
+that cames with all the updated numpy and matplotlib, already compiled to work
+in parallel.
+Moreover the last version of matplotlib will allow the user to modify the plots
+after they are produced.</p>
+<p>It can be simply installed from command line:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span>
+<span class="pre">`</span></code></p>
+<p>This command must be executed in the same directory as the setup.py script.
+Note, if you installed python in a system directory, administration rights may be
+requested (add a sudo before the command).
+Please, consider adopting anaconda-python to install the software on clusters where you do not have
+administration rights.</p>
+<p>Installation on clusters:</p>
+<p>It is suggested to install the package with the anaconda distribution.</p>
+<p>Please, remember that if you use the intel compiler, you need to delete the lapack linking from the
+setup.py and include the -mkl (as done for cellconstructor).
+Note that you must force to use the same liker compiler as the one used for the compilation.</p>
+<p>A specific setup.py script is provided to install it easily in FOSS clusters.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index1.html">Documentation overview</a><ul>
+      <li>Previous: <a href="intro.html" title="previous chapter">Introduction</a></li>
+      <li>Next: <a href="start.html" title="next chapter">Quick start</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Lorenzo Monacelli.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/install.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
