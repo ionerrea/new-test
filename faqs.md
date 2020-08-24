@@ -17,6 +17,34 @@ title: Frequently Asked Questions (FAQs)
 
 7. [How do I check if my calculations are well converged?](#How-do-I-check-if-my-calculations-are-well-converged?)
 
+8. [What is the final error on the structure or the dynamical matrix of a SCHA minimization?](#What-is-the-final-error-on-the-structure-or-the-dynamical-matrix-of-a-SCHA-minimization?)
+
+9. [How does the error over the gradients scale with the number of configurations?](#How-does-the-error-over-the-gradients-scale-with-the-number-of-configurations?)
+
+10. [When I relax the cell, is it necessary for the gradients to reach zero before making a step with the new cell?](#When-I-relax-the-cell,-is-it-necessary-for-the-gradients-to-reach-zero-before-making-a-step-with-the-new-cell?)
+
+11. [I cannot remove the pressure anisotropy after relaxing the cell, what is happening?](#I-cannot-remove-the-pressure-anisotropy-after-relaxing-the-cell,-what-is-happening?)
+
+12. [How may I run a calculation neglecting symmetries?](#How-may-I-run-a-calculation-neglecting-symmetries?)
+
+13. [In which units are the lattice vectors, the atomic positions, and the mass of the atoms in the dynamical matrix file?](#In-which-units-are-the-lattice-vectors,-the-atomic-positions,-and-the-mass-of-the-atoms-in-the-dynamical-matrix-file?)
+
+14. [What is the difference between the different kind of minimization (preconditioning and root_representation)?](#What-is-the-difference-between-the-different-kind-of-minimization-(preconditioning-and-root_representation)?)
+
+15. [How do I lock modes from m to n in the minimization?](#How-do-I-lock-modes-from-m-to-n-in-the-minimization?)
+
+16. [How do I lock a special atom in the minimization?](#How-do-I-lock-a-special-atom-in-the-minimization?)
+
+17. [How do I understand if I have to generate a new population or the minimization converged?](#How-do-I-understand-if-I-have-to-generate-a-new-population-or-the-minimization-converged?)
+
+18. [How do I choose the appropriate value of Kong-Liu effective sample size or ratio?](#How-do-I-choose-the-appropriate-value-of-Kong-Liu-effective-sample-size-o- ratio?)
+
+19. [How do I understand if the free energy hessian calculation is converged?](#How-do-I-understand-if-the-free-energy-hessian-calculation-is-converged?)
+
+20. [How can I add more configurations to an existing ensembe?](#How-can-I-add-more-configurations-to-an-existing-ensembe?)
+
+21. [How do I fix the random number generator seed to make a calculation reproducible?](#How-do-I-fix-the-random-number-generator-seed-to-make-a-calculation-reproducible?) 
+
 <a name="How-do-I-start-a-calculation-if-the-dynamical-matrices-have-imaginary-frequencies?"></a>
 # How do I start a calculation if the dynamical matrices have imaginary frequencies? 
 
@@ -135,84 +163,83 @@ This will plot all the files *frequencies_popX.dat* in the directory. You can se
 If between different populations (that you will distinguish by kink in the frequency evolutions) the frequencies will fluctuate due to the stochastic nature of the algorithm, with no general drift, then the algorithm reached its maximum accuracy with the given number of configurations.
 You may either stop the minimization, or increase the ensemble to improve the accuracy.
 
-
+<a name="What-is-the-final-error-on-the-structure-or-the-dynamical-matrix-of-a-SCHA-minimization?"></a>
 # What is the final error on the structure or the dynamical matrix of a SCHA minimization?
 
-    <br />
-    This is a difficult question. The best way to estimate the error is to generate a new ensemble with the same number of configuration at the end of the minimization and check how the final optimized solution changes with this new ensemble. This is also a good way to test if the solution is actually converged to the correct solution. The magnitude of the changes in the dynamical matrix’s frequencies and structure is an accurate estimation on the stochastic error.
+This is a difficult question. The best way to estimate the error is to generate a new ensemble with the same number of configuration at the end of the minimization and check how the final optimized solution changes with this new ensemble. This is also a good way to test if the solution is actually converged to the correct solution. The magnitude of the changes in the dynamical matrix’s frequencies and structure is an accurate estimation on the stochastic error.
 
-    You can always split the ensemble in two and run two minimization with the two half of the ensembe to get a hint on the error on the structure or on the dynamical matrix.
-    To split the ensemble, refer to the *FAQ* about the error on the hessian matrix.
+You can always split the ensemble in two and run two minimization with the two half of the ensembe to get a hint on the error on the structure or on the dynamical matrix.
+To split the ensemble, refer to the *FAQ* about the error on the hessian matrix.
 
-How does the error over the gradients scale with the number of configurations?
+<a name="How-does-the-error-over-the-gradients-scale-with-the-number-of-configurations?"></a>
+# How does the error over the gradients scale with the number of configurations?
 
-    <br />
-    The error scales as any stochastic method, with the inverse of the square root of the number of configurations. So to double the accuracy, the number of configurations must be multiplied by 4.
+The error scales as any stochastic method, with the inverse of the square root of the number of configurations. So to double the accuracy, the number of configurations must be multiplied by 4.
 
-When I relax the cell, is it necessary for the gradients to reach zero before making a step with the new cell?
+<a name="When-I-relax-the-cell,-is-it-necessary-for-the-gradients-to-reach-zero-before-making-a-step-with-the-new-cell?"></a>
+# When I relax the cell, is it necessary for the gradients to reach zero before making a step with the new cell?
 
-    <br />
-    In general it is good to have a reasonable dynamical matrix before starting with a variable cell relaxation. The best strategy is to perform a fixed cell relaxation with few configurations until you are close to the final solution (the gradients are comparable with their errors). Then you can start a variable cell relaxation and submit new populations in the suggested new cell even if the previous one was not perfectly converged.
+In general it is good to have a reasonable dynamical matrix before starting with a variable cell relaxation. The best strategy is to perform a fixed cell relaxation with few configurations until you are close to the final solution (the gradients are comparable with their errors). Then you can start a variable cell relaxation and submit new populations in the suggested new cell even if the previous one was not perfectly converged.
 
-I cannot remove the pressure anisotropy after relaxing the cell, what is happening?
+<a name="I-cannot-remove-the-pressure-anisotropy-after-relaxing-the-cell,-what-is-happening?"></a>
+# I cannot remove the pressure anisotropy after relaxing the cell, what is happening?
 
-    <br />
-    Variable cell calculation is a tricky algorithm. It could be that your bulk modulus is stronlgy anisotropic, so the algorithm has difficulties in optimizing well.
+Variable cell calculation is a tricky algorithm. It could be that your bulk modulus is stronlgy anisotropic, so the algorithm has difficulties in optimizing well.
     In general the stress tensor is also affected by stochastic error, so it is impossible to completely remove anisotropy. However, a converged result is one in which the residual anisotropy in the stress tensor is comparable to the stochastic error on the stress tensor.
     If you are not able to converge, you can either increase the number of configurations, modify the bulk_modulus parameter (increase it if the stress change too much between two populations, decrease it if it does not changes enough) or fix the overall volume (by using the fix_volume flag in the &relax namespace or in the vc_relax method if you are using the python script).
     Fixing the volume can improve the convergence of the variable cell algorithm by a lot.
 
-How may I run a calculation neglecting symmetries?
+<a name="How-may-I-run-a-calculation-neglecting-symmetries?"></a>
+# How may I run a calculation neglecting symmetries?
 
-    <br />
-    You can tell the code to neglect symmetries with the `neglect_symmetries = .true.` flag.
-    In the python script this is done setting the attribute *neglect_symmetries* of sscha.SchaMinimizer.SSCHA_Minimizer to False.
+You can tell the code to neglect symmetries with the `neglect_symmetries = .true.` flag.
+In the python script this is done setting the attribute *neglect_symmetries* of sscha.SchaMinimizer.SSCHA_Minimizer to False.
 
-In which units are the lattice vectors, the atomic positions, and the mass of the atoms in the dynamical matrix file?
+<a name="In-which-units-are-the-lattice-vectors,-the-atomic-positions,-and-the-mass-of-the-atoms-in-the-dynamical-matrix-file?"></a>
+# In which units are the lattice vectors, the atomic positions, and the mass of the atoms in the dynamical matrix file?
 
-    <br />
-    The dynamical matrix follows the quantum espresso units. They are Rydberg atomic units (unit of mass is 1/2  the electron mass, energy is Ry, positions are in Bohr. However, espresso may have an ibrav not equal to zero (the third number in the header of the dynamical matrix). In this case, please, refer to the espresso ibrav guide in the PW.x input description <https://www.quantum-espresso.org/Doc/INPUT_PW.html#idm199>
+The dynamical matrix follows the quantum espresso units. They are Rydberg atomic units (unit of mass is 1/2  the electron mass, energy is Ry, positions are in Bohr. However, espresso may have an ibrav not equal to zero (the third number in the header of the dynamical matrix). In this case, please, refer to the espresso ibrav guide in the PW.x input description <https://www.quantum-espresso.org/Doc/INPUT_PW.html#idm199>
 
-What is the difference between the different kind of minimization (preconditioning and root_representation)?
+<a name="What-is-the-difference-between-the-different-kind-of-minimization-(preconditioning-and-root_representation)?"></a>
+# What is the difference between the different kind of minimization (preconditioning and root_representation)?
 
-    <br />
-    The target of a SSCHA minimization is to find the ionic density matrix $\rho(\Phi, \vec {\mathcal R})$ that minimizes the total
+ The target of a SSCHA minimization is to find the ionic density matrix \\(rho(\Phi, \vec {\mathcal R})\\) that minimizes the total
     free energy. It may happen, if we are using a too big step for the dynamical matrix $\Phi$ that it becomes not positive definite.
     This may be due to the stochastic noise during the minimization.
     For avoid this to happen, you may set **root_representation** to either **sqrt** or **root4** (inside &inputscha namespace or the SSCHA_Minimizer object)
-    In this way, instead of minimizing the $\Phi$ matrix, we minimize with respect to $\sqrt{\Phi}$ or $\sqrt[4]{\Phi}$.
+    In this way, instead of minimizing the $\Phi$ matrix, we minimize with respect to \\(\sqrt{\Phi}$ or $\sqrt[4]{\Phi}\\).
     Therefore the new dynamical matrix are constrained in a space that is positive definite. Moreover, it has been proved that $\sqrt[4]{\Phi}$
     minimization is better conditioned than the original, and thus should reach the minimum faster.
 
-    Alternatively, a similar effect to the speedup in the minimization obtained with **root4** is possible if use the preconditioning (by setting **preconditioning** or **precond_dyn** to True in the input file or the python script, respectively). This way also the single minimization step runs faster, as it avoids passing in the root space of the dynamical matrix (but indeed, you can have imaginary frequencies).
+Alternatively, a similar effect to the speedup in the minimization obtained with **root4** is possible if use the preconditioning (by setting **preconditioning** or **precond_dyn** to True in the input file or the python script, respectively). This way also the single minimization step runs faster, as it avoids passing in the root space of the dynamical matrix (but indeed, you can have imaginary frequencies).
 
-    Since the gradient computation is much slower (especially for system with more than 80 atoms in the supercell) without the preconditioning,
+Since the gradient computation is much slower (especially for system with more than 80 atoms in the supercell) without the preconditioning,
     it is possible to combine the preconditioning with the root representation to have a faster gradient computation and to be garanteed that
     the dynamical matrix is positive definite by construction at each step.
     However, in this way the good condition number obtained by the preconditioning (or the root4 representation) is spoiled. For this reason, when using the preconditioning, avoid using **root4**, and chose instead **sqrt** as root_representation.
 
-    The default values are:
+The default values are:
 
-    ```
-    &inputscha
+```
+&inputscha
         root_representation = "normal"
         preconditioning = .true.
-    &end
-    ```
+&end
+```
 
-    or in python
+or in python
 
-    ```
-    # The ensemble has been loaded as ens
-    minim = sscha.SchaMinimizer.SSCHA_Minimizer(ens)
-    minim.root_representation = "normal"
-    minim.precond_dyn = True
-    ```
+```
+# The ensemble has been loaded as ens
+minim = sscha.SchaMinimizer.SSCHA_Minimizer(ens)
+minim.root_representation = "normal"
+minim.precond_dyn = True
+```
 
-How do I lock modes from m to n in the minimization?
+<a name="How-do-I-lock-modes-from-m-to-n-in-the-minimization?"></a>
+# How do I lock modes from m to n in the minimization?
 
-    <br />
-    Constrains to the minimization within the mode space may be added both in the input script and directly by the python version.
+Constrains to the minimization within the mode space may be added both in the input script and directly by the python version.
     In the input script, inside the namespace **&utils**, you should add:
 
     **mu_free_start = 30** and **mu_free_end = 36** : optimize only between mode 30 and 36 (for each q point).
@@ -225,49 +252,50 @@ How do I lock modes from m to n in the minimization?
 
     Modes may be also locked within the python scripting. Look at the LockModes example in the Examples directory.
 
-How do I lock a special atom in the minimization?
+<a name="How-do-I-lock-a-special-atom-in-the-minimization?"></a>
+# How do I lock a special atom in the minimization?
 
-    <br />
-    More complex constrains than mode locking may be activated in the minimization, but their use is limited within the python scripting.
+
+More complex constrains than mode locking may be activated in the minimization, but their use is limited within the python scripting.
     You can write your own constraining function that will be applied to the structure gradient or to the dynamical matrix gradient.
     This function should take as input the two gradients (dynamical matrix and structure) and operate directly on them.
     Then it can be passed to the minimization engine as *custom_function_gradient*.
 
-    ```
-    LIST_OF_ATOMS_TO_FIX = [0, 2, 3]
-    def fix_atoms(gradient_dyn, gradient_struct):
-        # Fix the atoms in the list
-        gradient_struct[LIST_OF_ATOMS_TO_FIX, :] = 0
+```
+LIST_OF_ATOMS_TO_FIX = [0, 2, 3]
+def fix_atoms(gradient_dyn, gradient_struct):
+# Fix the atoms in the list
+gradient_struct[LIST_OF_ATOMS_TO_FIX, :] = 0
+minim.run( custom_function_gradient = fix_atoms )
+```
 
-    minim.run( custom_function_gradient = fix_atoms )
-    ```
+Here, `minim` is the `SSCHA_Minimizer` class. In this case we only fix the structure gradient. However, in this way the overall gradient will have a translation (acoustic sum rule is violated). Be very carefull when doing this kind of constrains, and check if it is really what you want.
 
-    Here, `minim` is the `SSCHA_Minimizer` class. In this case we only fix the structure gradient. However, in this way the overall gradient will have a translation (acoustic sum rule is violated). Be very carefull when doing this kind of constrains, and check if it is really what you want.
+A more detailed and working example that fixes also the degrees of freedom of the dynamical matrix is reported in the FixAtoms example.
 
-    A more detailed and working example that fixes also the degrees of freedom of the dynamical matrix is reported in the FixAtoms example.
+<a name="How-do-I-understand-if-I-have-to-generate-a-new-population-or-the-minimization-converged?"></a>
+# How do I understand if I have to generate a new population or the minimization converged?
 
-How do I understand if I have to generate a new population or the minimization converged?
-
-    <br />
-    In general, if the code stops because the gradient is much below the error (less then 1%), then it is converged (with a Kong-Liu threshold ratio of at least 0.5). If the code ends the minimization because it went outside the stochastic criteria, a new population is required.
+In general, if the code stops because the gradient is much below the error (less then 1%), then it is converged (with a Kong-Liu threshold ratio of at least 0.5). If the code ends the minimization because it went outside the stochastic criteria, a new population is required.
     There are cases in which you use to few configurations to reach a small gradient before wasting the ensemble. If this is the case, print the frequencies during the minimizations (using the &utils card with `save_freq_filename` attribute). You may compare subsequent minimizations, if the frequencies are randomly moving between different minimization (and you cannot identify a trend in none of them), then you reach the limit of accuracy of the ensemble. Frequencies are a much better parameter to control for convergence than free energy, as the free energy close to the minimum is quadratic.
 
-How do I choose the appropriate value of Kong-Liu effective sample size or ratio?
+<a name="How-do-I-choose-the-appropriate-value-of-Kong-Liu-effective-sample-size-o- ratio?"></a>
+# How do I choose the appropriate value of Kong-Liu effective sample size or ratio?
 
-    <br />
-    The Kong-Liu (KL) effective sample size is an estimation on how good is the extracted set of configurations to describe the BO landscape around the current values of dynamical matrix and the centroid position. After the ensemble is generated, the KL sample size matches with the actual number of configurations, however, as the minimization goes, the KL sample size is reduced. The code stops when the KL sample size is below a certain threshold.
+The Kong-Liu (KL) effective sample size is an estimation on how good is the extracted set of configurations to describe the BO landscape around the current values of dynamical matrix and the centroid position. After the ensemble is generated, the KL sample size matches with the actual number of configurations, however, as the minimization goes, the KL sample size is reduced. The code stops when the KL sample size is below a certain threshold.
 
-    The default value of Kong-Liu threshold ratio is 0.5 (effective sample size = 0.5 the original number of configurations). This is a good and safe value for most situations. However, if you are very far from the minimum and the gradient is big, you can trust it even if it is very noisy. For this reason you can lower the Kong-Liu ratio to 0.2 or 0.1. However, notice that by construction the KL effective sample size is always bigger than 2. For this reason if you use 10 configurations, and you set a threshold ratio below 0.2, you will never reach the threshold, and your minimization will continue forever (going into a very bad regime where you are minimizing something that is completely random). On the other side, on some very complex system close to the minimum, it could be safe to increase the KL ratio even at 0.6.
+The default value of Kong-Liu threshold ratio is 0.5 (effective sample size = 0.5 the original number of configurations). This is a good and safe value for most situations. However, if you are very far from the minimum and the gradient is big, you can trust it even if it is very noisy. For this reason you can lower the Kong-Liu ratio to 0.2 or 0.1. However, notice that by construction the KL effective sample size is always bigger than 2. For this reason if you use 10 configurations, and you set a threshold ratio below 0.2, you will never reach the threshold, and your minimization will continue forever (going into a very bad regime where you are minimizing something that is completely random). On the other side, on some very complex system close to the minimum, it could be safe to increase the KL ratio even at 0.6.
 
-How do I understand if the free energy hessian calculation is converged?
+<a name="How-do-I-understand-if-the-free-energy-hessian-calculation-is-converged?"></a>
+# How do I understand if the free energy hessian calculation is converged?
 
-    <br />
-    The free energy hessian requires much more configurations than the SCHA minimization. First of all, to run the free energy Hessian, the SSCHA minimization must end with a gradient that can be decreased indefinitively without decreasing the KL below 0.7 /0.8.
+
+The free energy hessian requires much more configurations than the SCHA minimization. First of all, to run the free energy Hessian, the SSCHA minimization must end with a gradient that can be decreased indefinitively without decreasing the KL below 0.7 /0.8.
     Then you can estimate the error by repeating the hessian calculation with half of the ensemble and check how the frequencies of the hessian changes. This is also a good check for the final error on the frequencies.
 
-    You can split your ensemble in two by using the split function.
+You can split your ensemble in two by using the split function.
 
-    ```
+```
     import sscha, sscha.Ensemble
 
     # Load the dynamical matrix as dyn
@@ -295,20 +323,20 @@ How do I understand if the free energy hessian calculation is converged?
     # We can save the two half ensembles as population 2 and 3.
     ens_first_half.save("data_dir", population = 2)
     ens_second_half.save("data_dir", population = 3)
-    ```
+```
 
-    This simple script will generate two ensembles inside `data_dir` directory with population 2 and 3, each one containing the first
+This simple script will generate two ensembles inside `data_dir` directory with population 2 and 3, each one containing the first
     and the second half of the ensemble with population 1 respectively. You can perform then your calculation of the free energy hessian
     with both the ensemble to estimate the error on the frequencies and the polarization vectors.
 
-How can I add more configurations to an existing ensembe?
+<a name="How-can-I-add-more-configurations-to-an-existing-ensembe?"></a>
+# How can I add more configurations to an existing ensembe?
 
-    <br />
-    You can use the split and merge functions of the Ensemble class.
+You can use the split and merge functions of the Ensemble class.
     First of all you generate a new ensemble, you compute the energy and force for that ensemble,
     then you merge it inside another one.
 
-    ```
+```
     # Load the original ensemble (first population with 1000 configurations)
     ens = sscha.Ensemble.Ensemble(dynmat, T, dynmat.GetSupercell())
     ens.load("data_dir", population = 1, N = 1000)
@@ -328,22 +356,22 @@ How can I add more configurations to an existing ensembe?
 
     # Now ens contains the two ensembles. You can save it or directly use it for a SSCHA calculation
     ens.save("data_dir", population = 2)
-    ```
+```
 
-    Indeed, to avoid mistakes, when merging the ensemble you must be carefull that the dynamical matrix and the temperature
+Indeed, to avoid mistakes, when merging the ensemble you must be carefull that the dynamical matrix and the temperature
     used to generate both ensembles are the same.
 
-How do I fix the random number generator seed to make a calculation reproducible?
+<a name="How-do-I-fix-the-random-number-generator-seed-to-make-a-calculation-reproducible?"></a>
+# How do I fix the random number generator seed to make a calculation reproducible?
 
-    <br />
-    As for version 1.0, this can be achieved only by using the python script.
+As for version 1.0, this can be achieved only by using the python script.
     Since python uses numpy as random number generator, you can, at the beginning of the script that generates the ensemble, use the following:
 
-    ```
+```
     import numpy as np
 
     X = 0
     np.random.seed(seed = X)
-    ```
+```
 
-    where `X` is the integer used as a seed. By default, if not specified, it is initialized with None that it is equivalent of initializing with the current local time.
+where `X` is the integer used as a seed. By default, if not specified, it is initialized with None that it is equivalent of initializing with the current local time.
