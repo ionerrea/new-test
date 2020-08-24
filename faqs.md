@@ -4,7 +4,9 @@ title: Frequently Asked Questions (FAQs)
 ---
 
 [How do I start a calculation if the dynamical matrices have imaginary frequencies?](#How-do-I-start-a-calculation-if-the-dynamical-matrices-have-imaginary-frequencies?)
+
 [What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?](#What-are-the-reasonable-values-for-the-steps-(lambda_a,-lambda_w,-min_step_dyn-and-min_step_struc)?)
+
 [In a variable cell optimization, what is a reasonable value for the bulk modulus?](#In-a-variable-cell-optimization,-what-is-a-reasonable-value-for-the-bulk-modulus?)
 
 # How do I start a calculation if the dynamical matrices have imaginary frequencies?
@@ -61,8 +63,7 @@ The bulk modulus is just an indicative parameter used to guess the optimal step 
 Usual values are between 10 GPa and 100 GPa for system at ambient conditions. Diamond has a bulk modulus about 500 GPa. High pressure hydrides have a bulk modulus around 500 GPa as well.
 
 If you have no idea on the bulk modulus, you can easily compute them by doing two static *ab initio* calculations at very close volumes (by varying the cell size), and then computing the differences between the pressure:
-
-    B = - \\Omega \\frac{dP}{d\\Omega}where $\Omega$ is the unit-cell volume and $P$ is the pressure (in GPa).
+\\( B = - \Omega \frac{dP}{d\Omega} \\) where $\Omega$ is the unit-cell volume and $P$ is the pressure (in GPa).
 
 The code stops saying it has found imaginary frequencies, how do I fix it?
 
