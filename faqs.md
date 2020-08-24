@@ -1,4 +1,7 @@
-# Frequently Asked Questions (FAQs)
+---
+layout: page
+title: Frequently asked questions (FAQs)
+---
 
 How do I start a calculation if the Dynamical matrices have imaginary frequencies?
 
