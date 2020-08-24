@@ -3,13 +3,13 @@ layout: page
 title: Frequently Asked Questions (FAQs)
 ---
 
-[How do I start a calculation if the dynamical matrices have imaginary frequencies?](#How-do-I-start-a-calculation-if-the-dynamical-matrices-have-imaginary-frequencies?)
+1. [How do I start a calculation if the dynamical matrices have imaginary frequencies?](#How-do-I-start-a-calculation-if-the-dynamical-matrices-have-imaginary-frequencies?)
 
-[What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?](#What-are-the-reasonable-values-for-the-steps-(lambda_a,-lambda_w,-min_step_dyn-and-min_step_struc)?)
+2. [What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?](#What-are-the-reasonable-values-for-the-steps-(lambda_a,-lambda_w,-min_step_dyn-and-min_step_struc)?)
 
-[In a variable cell optimization, what is a reasonable value for the bulk modulus?](#In-a-variable-cell-optimization,-what-is-a-reasonable-value-for-the-bulk-modulus?)
+3. [In a variable cell optimization, what is a reasonable value for the bulk modulus?](#In-a-variable-cell-optimization,-what-is-a-reasonable-value-for-the-bulk-modulus?)
 
-# How do I start a calculation if the dynamical matrices have imaginary frequencies?
+# How do I start a calculation if the dynamical matrices have imaginary frequencies? <a name="How-do-I-start-a-calculation-if-the-dynamical-matrices-have-imaginary-frequencies?"></a>
 
 Good starting point for a sscha minimization are the dynamical matrix obtained from a harmonic calculation. However, they can have imaginary frequencies. This may be related to both instabilities (the structure is a saddle-point of the Born-Oppenheimer energy landscape) or to a not well converged choice of the parameters for computing the harmonic frequencies..
 In both cases, it is very easy to get a new dynamical matrix that is positive definite and can be used as starting point. An example is made in Turorial on H3S.
