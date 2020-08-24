@@ -4,6 +4,8 @@ title: Frequently Asked Questions (FAQs)
 ---
 
 [How do I start a calculation if the dynamical matrices have imaginary frequencies?](#How-do-I-start-a-calculation-if-the-dynamical-matrices-have-imaginary-frequencies?)
+[What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?](#What-are-the-reasonable-values-for-the-steps-(lambda_a,-lambda_w,-min_step_dyn-and-min_step_struc)?)
+[In a variable cell optimization, what is a reasonable value for the bulk modulus?](#In-a-variable-cell-optimization,-what-is-a-reasonable-value-for-the-bulk-modulus?)
 
 # How do I start a calculation if the dynamical matrices have imaginary frequencies?
 
@@ -36,34 +38,29 @@ The previous script (that we can save into *script.py*) will generate the positi
 python script.py
 ```
 
-[What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?](#What-are-the-reasonable-values-for-the-steps-(lambda_a,-lambda_w,-min_step_dyn-and-min_step_struc)?)
-
 # What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?
 
-    <br />
-    The code minimizes using a Newton method: preconditioned gradient descend. Thanks to an analytical evaluation of the hessian matrix, the step is rescaled so that the theoretical best step is close to 1.
-    In other words: **one is theoretically the  best (and the default) choice for the steps**. However, the SSCHA is a stochastic algorithm, therefore, if the ensemble is too small, or the gradient is very big, this step could bring you outside the region in which the ensemble is describing well the physics very soon.
-    Since SSCHA can exploit the reweighting, and the most computational expensive part of the algorithm is the computation of forces and energies, it is often much better using a small step (smaller than the optimal one). **Good values of the steps are usually around 0.01 and 0.1**. Rule of thumbs: the minimization should not end because it whent outside the stochastic regime before that at least 10 steps have been made. This will depend on the system, the number of configurations and how far from the correct solution you are.
+The code minimizes using a Newton method: preconditioned gradient descend. Thanks to an analytical evaluation of the hessian matrix, the step is rescaled so that the theoretical best step is close to 1. In other words: **one is theoretically the  best (and the default) choice for the steps**. However, the SSCHA is a stochastic algorithm, therefore, if the ensemble is too small, or the gradient is very big, this step could bring you outside the region in which the ensemble is describing well the physics very soon.
 
-    **lambda_w** is the step in the atomic positions (stand-alone program input).
+Since SSCHA can exploit the reweighting, and the most computational expensive part of the algorithm is the computation of forces and energies, it is often much better using a small step (smaller than the optimal one). **Good values of the steps are usually around 0.01 and 0.1**. Rule of thumbs: the minimization should not end because it whent outside the stochastic regime before that at least 10 steps have been made. This will depend on the system, the number of configurations and how far from the correct solution you are.
 
-    **lambda_a** is the step in the dynamical matrix (stand-alone program input).
+**lambda_w** is the step in the atomic positions (stand-alone program input).
 
-    If you are using the python script, the equivalent variables are the attributes of the sscha.SchaMinimizer.SSCHA_Minimizer class.
+**lambda_a** is the step in the dynamical matrix (stand-alone program input).
 
-    **min_step_struc** is the step in the atomic positions (stand-alone program input).
+If you are using the python script, the equivalent variables are the attributes of the sscha.SchaMinimizer.SSCHA_Minimizer class.
 
-    **min_step_dyn** is the step in the dynamical matrix (stand-alone program input).
+**min_step_struc** is the step in the atomic positions (stand-alone program input).
 
-In a variable cell optimization, what is a reasonable value for the bulk modulus?
+**min_step_dyn** is the step in the dynamical matrix (stand-alone program input).
 
-    <br />
-    The bulk modulus is just an indicative parameter used to guess the optimal step of the lattice parameters in order to converge as quickly as possible.
-    It is expressed in GPa. You can find online the bulk modulus for many materials. Find a material similar to the one you are studying and look if there is in letterature a bulk modulus.
+# In a variable cell optimization, what is a reasonable value for the bulk modulus?
 
-    Usual values are between 10 GPa and 100 GPa for system at ambient conditions. Diamond has a bulk modulus about 500 GPa. High pressure hydrates have a bulk modulus around 500 GPa as well.
+The bulk modulus is just an indicative parameter used to guess the optimal step of the lattice parameters in order to converge as quickly as possible. It is expressed in GPa. You can find online the bulk modulus for many materials. Find a material similar to the one you are studying and look if there is in letterature a bulk modulus.
 
-    If you have no idea on the bulk modulus, you can easily compute them by doing two static *ab initio* calculations at very close volumes (by varying the cell size), and then computing the differences between the pressure:
+Usual values are between 10 GPa and 100 GPa for system at ambient conditions. Diamond has a bulk modulus about 500 GPa. High pressure hydrides have a bulk modulus around 500 GPa as well.
+
+If you have no idea on the bulk modulus, you can easily compute them by doing two static *ab initio* calculations at very close volumes (by varying the cell size), and then computing the differences between the pressure:
 
     B = - \\Omega \\frac{dP}{d\\Omega}where $\Omega$ is the unit-cell volume and $P$ is the pressure (in GPa).
 
