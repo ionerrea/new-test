@@ -204,10 +204,10 @@ The dynamical matrix follows the quantum espresso units. They are Rydberg atomic
 # What is the difference between the different kind of minimization (preconditioning and root_representation)?
 
  The target of a SSCHA minimization is to find the ionic density matrix \\(\rho(\Phi, \vec {\mathcal R})\\) that minimizes the total
-    free energy. It may happen, if we are using a too big step for the dynamical matrix $\Phi$ that it becomes not positive definite.
+    free energy. It may happen, if we are using a too big step for the dynamical matrix \\(\Phi\\) that it becomes not positive definite.
     This may be due to the stochastic noise during the minimization.
     For avoid this to happen, you may set **root_representation** to either **sqrt** or **root4** (inside &inputscha namespace or the SSCHA_Minimizer object)
-    In this way, instead of minimizing the $\Phi$ matrix, we minimize with respect to \\(\sqrt{\Phi}\\) or \\(\sqrt[4]{\Phi}\\).
+    In this way, instead of minimizing the \\(\Phi\\) matrix, we minimize with respect to \\(\sqrt{\Phi}\\) or \\(\sqrt[4]{\Phi}\\).
     Therefore the new dynamical matrix are constrained in a space that is positive definite. Moreover, it has been proved that \\(\sqrt[4]{\Phi}\\)
     minimization is better conditioned than the original, and thus should reach the minimum faster.
 
