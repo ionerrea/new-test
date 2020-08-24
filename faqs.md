@@ -36,7 +36,9 @@ The previous script (that we can save into *script.py*) will generate the positi
 python script.py
 ```
 
-What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?
+[What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?](#What-are-the-reasonable-values-for-the-steps-(lambda_a,-lambda_w,-min_step_dyn-and-min_step_struc)?)
+
+# What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?
 
     <br />
     The code minimizes using a Newton method: preconditioned gradient descend. Thanks to an analytical evaluation of the hessian matrix, the step is rescaled so that the theoretical best step is close to 1.
