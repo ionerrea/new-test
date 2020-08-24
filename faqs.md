@@ -9,6 +9,14 @@ title: Frequently Asked Questions (FAQs)
 
 3. [In a variable cell optimization, what is a reasonable value for the bulk modulus?](#In-a-variable-cell-optimization,-what-is-a-reasonable-value-for-the-bulk-modulus?)
 
+4. [The code stops saying it has found imaginary frequencies, how do I fix it?](#The-code-stops-saying-it-has-found-imaginary-frequencies,-how-do-I-fix-it?)
+
+5. [Why the gradient sometimes increases during a minimization?](#Why-the-gradient-sometimes-increases-during-a-minimization?)
+
+6. [The gradients on my simulations are increasing a lot, why is this happening?](#The-gradients-on-my-simulations-are-increasing-a-lot,-why-is-this-happening?)
+
+7. [How do I check if my calculations are well converged?](#How-do-I-check-if-my-calculations-are-well-converged?)
+
 <a name="How-do-I-start-a-calculation-if-the-dynamical-matrices-have-imaginary-frequencies?"></a>
 # How do I start a calculation if the dynamical matrices have imaginary frequencies? 
 
@@ -40,7 +48,7 @@ The previous script (that we can save into *script.py*) will generate the positi
 ```
 python script.py
 ```
-
+<a name="What-are-the-reasonable-values-for-the-steps-(lambda_a,-lambda_w,-min_step_dyn-and-min_step_struc)?"></a>
 # What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?
 
 The code minimizes using a Newton method: preconditioned gradient descend. Thanks to an analytical evaluation of the hessian matrix, the step is rescaled so that the theoretical best step is close to 1. In other words: **one is theoretically the  best (and the default) choice for the steps**. However, the SSCHA is a stochastic algorithm, therefore, if the ensemble is too small, or the gradient is very big, this step could bring you outside the region in which the ensemble is describing well the physics very soon.
@@ -57,6 +65,7 @@ If you are using the python script, the equivalent variables are the attributes 
 
 **min_step_dyn** is the step in the dynamical matrix (stand-alone program input).
 
+<a name="In-a-variable-cell-optimization,-what-is-a-reasonable-value-for-the-bulk-modulus?"></a>
 # In a variable cell optimization, what is a reasonable value for the bulk modulus?
 
 The bulk modulus is just an indicative parameter used to guess the optimal step of the lattice parameters in order to converge as quickly as possible. It is expressed in GPa. You can find online the bulk modulus for many materials. Find a material similar to the one you are studying and look if there is in letterature a bulk modulus.
@@ -64,70 +73,70 @@ The bulk modulus is just an indicative parameter used to guess the optimal step 
 Usual values are between 10 GPa and 100 GPa for system at ambient conditions. Diamond has a bulk modulus about 500 GPa. High pressure hydrides have a bulk modulus around 500 GPa as well.
 
 If you have no idea on the bulk modulus, you can easily compute them by doing two static *ab initio* calculations at very close volumes (by varying the cell size), and then computing the differences between the pressure:
-\\( B = - \Omega \frac{dP}{d\Omega} \\) where $\Omega$ is the unit-cell volume and $P$ is the pressure (in GPa).
+\\( B = - \Omega \frac{dP}{d\Omega} \\) where \\(Omega\\) is the unit-cell volume and \\(P\\) is the pressure (in GPa).
 
-The code stops saying it has found imaginary frequencies, how do I fix it?
+<a name="The-code-stops-saying-it-has-found-imaginary-frequencies,-how-do-I-fix-it?"></a>
+# The code stops saying it has found imaginary frequencies, how do I fix it?
 
-    <br />
-    This means that you step is too large. You can reduce the step of the minimization. An alternative (often more efficient) is to switch to the root representation.
-    In this way the square root of the dynamical matrix is minimized, and the total dynamical matrix is positive definite in the whole minimization by construction.
+This means that you step is too large. You can reduce the step of the minimization. An alternative (often more efficient) is to switch to the root representation. In this way the square root of the dynamical matrix is minimized, and the total dynamical matrix is positive definite in the whole minimization by construction.
 
-    In the namelist input you activate this minimization with the following keywords inside the &inputscha namelist
+In the namelist input you activate this minimization with the following keywords inside the &inputscha namelist
 
-    ```
-    preconditioning = .false.
-    root_representation = "root4"
-    ```
+```
+preconditioning = .false.
+root_representation = "root4"
+```
 
-    Or, in the python script, you setup the attributes of the sscha.SchaMinimizer.SSCHA_Minimizer class
+Or, in the python script, you setup the attributes of the sscha.SchaMinimizer.SSCHA_Minimizer class
 
-    ```
-    minim.preconditioning = False
-    minim.root_representation = "root4"
-    ```
+```
+minim.preconditioning = False
+minim.root_representation = "root4"
+```
 
-    It is possible that the optimal step size for the root_representation is different than the other one.
+It is possible that the optimal step size for the root_representation is different than the other one.
 
-Why the gradient sometimes increases during a minimization?
+<a name="Why-the-gradient-sometimes-increases-during-a-minimization?"></a>
+# Why the gradient sometimes increases during a minimization?
 
-    <br />
-    Noting in principle assures that a gradient should always go down. It is possible at the beginning of the calculation when we are far from the solution that one of the gradients increases.
-    However, when we get closer to the solution, indeed the gradient must decrease.
-    If this does not happen it could be due to the ensemble that has fewer configurations than necessary. In this case, the good choice is to increase the number of effective sample size (the kong-liu ratio), in order to stop the minimization when the gradient start increasing, or to increase the number of configurations in the ensemble.
+Noting in principle assures that a gradient should always go down. It is possible at the beginning of the calculation when we are far from the solution that one of the gradients increases.
+However, when we get closer to the solution, indeed the gradient must decrease.
+If this does not happen it could be due to the ensemble that has fewer configurations than necessary. In this case, the good choice is to increase the number of effective sample size (the kong-liu ratio), in order to stop the minimization when the gradient start increasing, or to increase the number of configurations in the ensemble.
 
-    In any case, what must decrease is the free energy. If you see that the gradient is increasing but the free energy decreases, then the minimization is correct. However, if both the gradient and the free energy are increasing, something is wrong. This could be due to a too big step size, then try to reduce the value of **lambda_a** and **lambda_w** (in the input file) or **min_step_dyn** and **min_step_struc** (in the python script). It could also be due to a wasted ensemble, in this case, check the value of the Kong-Liu effective sample size, if it is below or around 0.5, then try to increase the threshold at which stop the calculation, **kong_liu_ratio** (in the python script) or **N_random_eff** (in the input file), or increase the number of configurations for the next population.
+In any case, what must decrease is the free energy. If you see that the gradient is increasing but the free energy decreases, then the minimization is correct. However, if both the gradient and the free energy are increasing, something is wrong. This could be due to a too big step size, then try to reduce the value of **lambda_a** and **lambda_w** (in the input file) or **min_step_dyn** and **min_step_struc** (in the python script). It could also be due to a wasted ensemble, in this case, check the value of the Kong-Liu effective sample size, if it is below or around 0.5, then try to increase the threshold at which stop the calculation, **kong_liu_ratio** (in the python script) or **N_random_eff** (in the input file), or increase the number of configurations for the next population.
 
-The gradients on my simulations are increasing a lot, why is this happening?
+<a name="The-gradients-on-my-simulations-are-increasing-a-lot,-why-is-this-happening?"></a>
+# The gradients on my simulations are increasing a lot, why is this happening?
 
-    <br />
-    See the previous question.
+See the previous question.
 
-How do I check if my calculations are well converged?
+<a name="How-do-I-check-if-my-calculations-are-well-converged?"></a>
+# How do I check if my calculations are well converged?
 
-    <br />
-    In general, if the gradient goes to zero and the Kong Liu ratio is above 0.5 probably your calculation converged very well.
-    There are some cases (especially in systems with many atoms) in which it is difficult to have an ensemble sufficiently big to reach this condition.
-    In these cases, you can look at the history of the frequencies in the last populations.
+In general, if the gradient goes to zero and the Kong Liu ratio is above 0.5 probably your calculation converged very well.
+There are some cases (especially in systems with many atoms) in which it is difficult to have an ensemble sufficiently big to reach this condition.
+In these cases, you can look at the history of the frequencies in the last populations.
 
-    If the code is provided with a &utils namespace, on which the code
+If the code is provided with a &utils namespace, on which the code
 
-    ```
-    &utils
-       save_freq_filename = "frequencies_popX.dat"
-    &end
-    ```
+```
+&utils
+      save_freq_filename = "frequencies_popX.dat"
+&end
+```
 
-    You can after the minimization use the plotting program to see the frequencies as they evolve during the minimizations:
+You can after the minimization use the plotting program to see the frequencies as they evolve during the minimizations:
 
-    ```
-    plot_frequencies_new.pyx frequencies_pop*.dat
-    ```
+```
+plot_frequencies_new.pyx frequencies_pop*.dat
+```
 
-    This will plot all the files *frequencies_popX.dat* in the directory. You can see all the history of the frequency minimization.
-    If between different populations (that you will distinguish by kink in the frequency evolutions) the frequencies will fluctuate due to the stochastic nature of the algorithm, with no general drift, then the algorithm reached its maximum accuracy with the given number of configurations.
-    You may either stop the minimization, or increase the ensemble to improve the accuracy.
+This will plot all the files *frequencies_popX.dat* in the directory. You can see all the history of the frequency minimization.
+If between different populations (that you will distinguish by kink in the frequency evolutions) the frequencies will fluctuate due to the stochastic nature of the algorithm, with no general drift, then the algorithm reached its maximum accuracy with the given number of configurations.
+You may either stop the minimization, or increase the ensemble to improve the accuracy.
 
-What is the final error on the structure or the dynamical matrix of a SCHA minimization?
+
+# What is the final error on the structure or the dynamical matrix of a SCHA minimization?
 
     <br />
     This is a difficult question. The best way to estimate the error is to generate a new ensemble with the same number of configuration at the end of the minimization and check how the final optimized solution changes with this new ensemble. This is also a good way to test if the solution is actually converged to the correct solution. The magnitude of the changes in the dynamical matrix’s frequencies and structure is an accurate estimation on the stochastic error.
