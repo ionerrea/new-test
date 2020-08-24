@@ -101,7 +101,7 @@ The bulk modulus is just an indicative parameter used to guess the optimal step 
 Usual values are between 10 GPa and 100 GPa for system at ambient conditions. Diamond has a bulk modulus about 500 GPa. High pressure hydrides have a bulk modulus around 500 GPa as well.
 
 If you have no idea on the bulk modulus, you can easily compute them by doing two static *ab initio* calculations at very close volumes (by varying the cell size), and then computing the differences between the pressure:
-\\( B = - \Omega \frac{dP}{d\Omega} \\) where \\(Omega\\) is the unit-cell volume and \\(P\\) is the pressure (in GPa).
+\\( B = - \Omega \frac{dP}{d\Omega} \\) where \\(\Omega\\) is the unit-cell volume and \\(P\\) is the pressure (in GPa).
 
 <a name="The-code-stops-saying-it-has-found-imaginary-frequencies,-how-do-I-fix-it?"></a>
 # The code stops saying it has found imaginary frequencies, how do I fix it?
@@ -203,12 +203,12 @@ The dynamical matrix follows the quantum espresso units. They are Rydberg atomic
 <a name="What-is-the-difference-between-the-different-kind-of-minimization-(preconditioning-and-root_representation)?"></a>
 # What is the difference between the different kind of minimization (preconditioning and root_representation)?
 
- The target of a SSCHA minimization is to find the ionic density matrix \\(rho(\Phi, \vec {\mathcal R})\\) that minimizes the total
+ The target of a SSCHA minimization is to find the ionic density matrix \\(\rho(\Phi, \vec {\mathcal R})\\) that minimizes the total
     free energy. It may happen, if we are using a too big step for the dynamical matrix $\Phi$ that it becomes not positive definite.
     This may be due to the stochastic noise during the minimization.
     For avoid this to happen, you may set **root_representation** to either **sqrt** or **root4** (inside &inputscha namespace or the SSCHA_Minimizer object)
-    In this way, instead of minimizing the $\Phi$ matrix, we minimize with respect to \\(\sqrt{\Phi}$ or $\sqrt[4]{\Phi}\\).
-    Therefore the new dynamical matrix are constrained in a space that is positive definite. Moreover, it has been proved that $\sqrt[4]{\Phi}$
+    In this way, instead of minimizing the $\Phi$ matrix, we minimize with respect to \\(\sqrt{\Phi}\\) or \\(\sqrt[4]{\Phi}\\).
+    Therefore the new dynamical matrix are constrained in a space that is positive definite. Moreover, it has been proved that \\(\sqrt[4]{\Phi}\\)
     minimization is better conditioned than the original, and thus should reach the minimum faster.
 
 Alternatively, a similar effect to the speedup in the minimization obtained with **root4** is possible if use the preconditioning (by setting **preconditioning** or **precond_dyn** to True in the input file or the python script, respectively). This way also the single minimization step runs faster, as it avoids passing in the root space of the dynamical matrix (but indeed, you can have imaginary frequencies).
