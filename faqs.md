@@ -1,39 +1,40 @@
 ---
 layout: page
-title: Frequently asked questions (FAQs)
+title: Frequently Asked Questions (FAQs)
 ---
 
-How do I start a calculation if the Dynamical matrices have imaginary frequencies?
+[How do I start a calculation if the dynamical matrices have imaginary frequencies?](#How-do-I-start-a-calculation-if-the-dynamical-matrices-have-imaginary-frequencies?)
 
-    <br />
-    Good starting point for a sscha minimization are the dynamical matrix obtained from a harmonic calculation. However, they can have imaginary frequencies. This may be related to both instabilities (the structure is a saddle-point of the Born-Oppenheimer energy landscape) or to a not well converged choice of the parameters for computing the harmonic frequencies..
-    In both cases, it is very easy to get a new dynamical matrix that is positive definite and can be used as starting point. An example is made in Turorial on H3S.
-    Assuming your not positive definite dynamical matrix is in Quantum Espresso format “harm1” … “harmN” (with N the number of irreducible q points), you can generate a positive definite dynamical matrix “positive1” … “positiveN” with the following python script that uses CellConstructor.
+# How do I start a calculation if the dynamical matrices have imaginary frequencies?
 
-    ```
-    # Load the cellconstructor library
-    import cellconstructor as CC
-    import cellconstructor.Phonons
+Good starting point for a sscha minimization are the dynamical matrix obtained from a harmonic calculation. However, they can have imaginary frequencies. This may be related to both instabilities (the structure is a saddle-point of the Born-Oppenheimer energy landscape) or to a not well converged choice of the parameters for computing the harmonic frequencies..
+In both cases, it is very easy to get a new dynamical matrix that is positive definite and can be used as starting point. An example is made in Turorial on H3S.
+Assuming your not positive definite dynamical matrix is in Quantum Espresso format “harm1” … “harmN” (with N the number of irreducible q points), you can generate a positive definite dynamical matrix “positive1” … “positiveN” with the following python script that uses CellConstructor.
 
-    # Load the harmonic not-positive definite dynamical matrix
-    # We are reading 6 dynamical matrices
-    harm = CC.Phonons.Phonons("harm", nqirr = 6)
+```
+# Load the cellconstructor library
+import cellconstructor as CC
+import cellconstructor.Phonons
+   
+# Load the harmonic not-positive definite dynamical matrix
+# We are reading 6 dynamical matrices
+harm = CC.Phonons.Phonons("harm", nqirr = 6)
 
-    # Apply the acoustic sum rule and the symmetries
-    harm.Symmetrize()
+# Apply the acoustic sum rule and the symmetries
+harm.Symmetrize()
 
-    # Force the frequencies to be positive definite
-    harm.ForcePositiveDefinite()
+# Force the frequencies to be positive definite
+harm.ForcePositiveDefinite()
 
-    # Save the final dynamical matrix, ready to be used in a sscha run
-    harm.save_qe("positive")
-    ```
+# Save the final dynamical matrix, ready to be used in a sscha run
+harm.save_qe("positive")
+```
 
-    The previous script (that we can save into *script.py*) will generate the positive definite matrix ready for the sscha run. It may be executed with
+The previous script (that we can save into *script.py*) will generate the positive definite matrix ready for the sscha run. It may be executed with
 
-    ```
-    python script.py
-    ```
+```
+python script.py
+```
 
 What are the reasonable values for the steps (lambda_a, lambda_w, min_step_dyn and min_step_struc)?
 
