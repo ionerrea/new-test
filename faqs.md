@@ -279,7 +279,7 @@ A more detailed and working example that fixes also the degrees of freedom of th
 In general, if the code stops because the gradient is much below the error (less then 1%), then it is converged (with a Kong-Liu threshold ratio of at least 0.5). If the code ends the minimization because it went outside the stochastic criteria, a new population is required.
     There are cases in which you use to few configurations to reach a small gradient before wasting the ensemble. If this is the case, print the frequencies during the minimizations (using the &utils card with `save_freq_filename` attribute). You may compare subsequent minimizations, if the frequencies are randomly moving between different minimization (and you cannot identify a trend in none of them), then you reach the limit of accuracy of the ensemble. Frequencies are a much better parameter to control for convergence than free energy, as the free energy close to the minimum is quadratic.
 
-<a name="How-do-I-choose-the-appropriate-value-of-Kong-Liu-effective-sample-size-o- ratio?"></a>
+<a name="How-do-I-choose-the-appropriate-value-of-Kong-Liu-effective-sample-size-o-ratio?"></a>
 # How do I choose the appropriate value of Kong-Liu effective sample size or ratio?
 
 The Kong-Liu (KL) effective sample size is an estimation on how good is the extracted set of configurations to describe the BO landscape around the current values of dynamical matrix and the centroid position. After the ensemble is generated, the KL sample size matches with the actual number of configurations, however, as the minimization goes, the KL sample size is reduced. The code stops when the KL sample size is below a certain threshold.
