@@ -37,7 +37,7 @@ title: Frequently Asked Questions (FAQs)
 
 17. [How do I understand if I have to generate a new population or the minimization converged?](#How-do-I-understand-if-I-have-to-generate-a-new-population-or-the-minimization-converged?)
 
-18. [How do I choose the appropriate value of Kong-Liu effective sample size or ratio?](#How-do-I-choose-the-appropriate-value-of-Kong-Liu-effective-sample-size-o- ratio?)
+18. [How do I choose the appropriate value of Kong-Liu effective sample size or ratio?](#How-do-I-choose-the-appropriate-value-of-Kong-Liu-effective-sample-size-or-ratio?)
 
 19. [How do I understand if the free energy hessian calculation is converged?](#How-do-I-understand-if-the-free-energy-hessian-calculation-is-converged?)
 
