@@ -29,9 +29,9 @@ relies on it.
 
 To install all the dependences, simply run
 
-`\`bash
+```
 pip install -r requirements.txt
-\``
+```
 
 ## Installation
 
@@ -43,9 +43,9 @@ after they are produced.
 
 It can be simply installed from command line:
 
-`\`bash
+```
 python setup.py install
-\``
+```
 
 This command must be executed in the same directory as the setup.py script.
 Note, if you installed python in a system directory, administration rights may be
