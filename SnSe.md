@@ -1,3 +1,7 @@
+---
+layout: page
+---
+
 ::: {#notebook .border-box-sizing tabindex="-1"}
 ::: {#notebook-container .container}
 ::: {.cell .border-box-sizing .text_cell .rendered}
