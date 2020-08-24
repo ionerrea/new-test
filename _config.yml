@@ -26,11 +26,11 @@ navbar-links:
   User guide: "/userguide/index1"
   Faqs: "faqs"
   Tutorials:
-    - Lead telluride: "/tutorials/Tutorial_PbTe"
-    - Tin telluride with force fields: "/tutorials/SnSe"
-    - Sulfur hydride: "/tutorials/Automatic_Calculations"
-    - Lanthanum hydride: "/tutorials/VariableCellRelaxation"
-    - Structural instabilities: "/tutorials/StructuralInstability"
+    - Lead telluride: "Tutorial_PbTe"
+    - Tin telluride with force fields: "SnSe"
+    - Sulfur hydride: "Automatic_Calculations"
+    - Lanthanum hydride: "VariableCellRelaxation"
+    - Structural instabilities: "StructuralInstability"
   Refernces and how to cite: "references"
   Contact: "contact"
 
