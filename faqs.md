@@ -242,15 +242,15 @@ minim.precond_dyn = True
 Constrains to the minimization within the mode space may be added both in the input script and directly by the python version.
     In the input script, inside the namespace **&utils**, you should add:
 
-    **mu_free_start = 30** and **mu_free_end = 36** : optimize only between mode 30 and 36 (for each q point).
+**mu_free_start = 30** and **mu_free_end = 36** : optimize only between mode 30 and 36 (for each q point).
 
-    You can also use the keywords **mu_lock_start** and **mu_lock_end** to freeze only a subset of modes.
+You can also use the keywords **mu_lock_start** and **mu_lock_end** to freeze only a subset of modes.
 
-    You can also choose if you want to freeze only the dynamical matrix or also the structure relaxation along those directions, by picking:
+You can also choose if you want to freeze only the dynamical matrix or also the structure relaxation along those directions, by picking:
 
-    **project_dyn = .true.** and **project_structure = .false.**. In this way, I freeze only the dynamical matrix along the specified modes, but not the structure.
+**project_dyn = .true.** and **project_structure = .false.**. In this way, I freeze only the dynamical matrix along the specified modes, but not the structure.
 
-    Modes may be also locked within the python scripting. Look at the LockModes example in the Examples directory.
+Modes may be also locked within the python scripting. Look at the LockModes example in the Examples directory.
 
 <a name="How-do-I-lock-a-special-atom-in-the-minimization?"></a>
 # How do I lock a special atom in the minimization?
