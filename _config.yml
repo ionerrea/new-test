@@ -20,18 +20,18 @@ baseurl: "/new-test"
 
 # List of links in the navigation bar
 navbar-links:
-  Developers: "developers"
   News: "news"
   Donwload and installation: "download"
-  User guide: "/userguide/index1"
-  Faqs: "faqs"
   Tutorials:
     - Lead telluride: "/Tutorials/Tutorial_PbTe"
     - Tin telluride with force fields: "/Tutotials/SnSe"
     - Sulfur hydride: "/Tutorials/Automatic_Calculations"
     - Lanthanum hydride: "/Tutorials/VariableCellRelaxation"
     - Structural instabilities: "/Tutorials/StructuralInstability"
+  Faqs: "faqs"
+  User guide: "/userguide/index1"
   Refernces and how to cite: "references"
+  Developers: "developers"
   Contact: "contact"
 
 
