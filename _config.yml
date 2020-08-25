@@ -24,10 +24,11 @@ navbar-links:
   Donwload and installation: "download"
   Tutorials:
     - Lead telluride: "/Tutorials/Tutorial_PbTe"
+    - Lead telluride structural instability: "/Tutorials/StructuralInstability"
+    - Lead telluride spectral properties: "/Tutorials/tutorial_spectral"
     - Tin telluride with force fields: "/Tutotials/SnSe"
     - Sulfur hydride: "/Tutorials/Automatic_Calculations"
     - Lanthanum hydride: "/Tutorials/VariableCellRelaxation"
-    - Structural instabilities: "/Tutorials/StructuralInstability"
   Faqs: "faqs"
   User guide: "/userguide/index1"
   Refernces and how to cite: "references"
