@@ -9,23 +9,27 @@ title: Developers
 >
 >**e-mail:** raffaello.bianco@ehu.eus
 
+[![Matteo Calandra](img/Matteo_Calandra.jpg)](https://mcalandra.github.io/) [**Matteo Calandra**](https://mcalandra.github.io/) – University of Trento, Trento, Italy
+
+> Full Professor at the [*University of Trento*](https://www.unitn.it/) and CNRS Research Director at [*Sorbonne Université*](https://www.sorbonne-universite.fr/) .
+>
+>**e-mail:** m.calandrabuonaura@unitn.it
+
 [![Ion Errea](img/Ion_Errea.jpg)](https://ionerrea.wordpress.com/) [**Ion Errea**](https://ionerrea.wordpress.com/) – University of the Basque Country, San Sebastian, Spain
 
 > Professor at the University of the Basque Country (UPV/EHU), leader of the *Quantum Theory of Materials* group at the [*Materials Physics Center*](https://cfm.ehu.es/eu/), and associated researcher at the [*Donostia International Physics Center*](http://dipc.ehu.es/index.php) .
 >
 >**e-mail:** ion.errea@ehu.eus
 
+[![Francesco Mauri](img/Francesco_Mauri.jpg)](http://www2.phys.uniroma1.it/doc/mauri/) [**Francesco Mauri**](http://www2.phys.uniroma1.it/doc/mauri/) – Università di Roma La Sapienza, Rome, Italy
+
+> Full Professor at the [*Università di Roma La Sapienza*](https://www.uniroma1.it/en/pagina-strutturale/home) .
+>
+>**e-mail:** francesco.mauri@uniroma1.it
+
+[![Lorenzo Monacelli](img/Lorenzo_Monacelli.jpg)](www.lafisicadimonacelli.it) [**Lorenzo Monacelli**](www.lafisicadimonacelli.it) – Università di Roma La Sapienza, Rome, Italy
+
+> Postdoctoral researcher at [*Università di Roma La Sapienza*](https://www.uniroma1.it/en/pagina-strutturale/home) .
+>
+>**e-mail:** lorenzo.monacelli@roma1.infn.it
  
-[![Lei Wang](img/lei.jpg)](http://wangleiphy.github.io/) [**Lei Wang**](http://wangleiphy.github.io/) – Institute of Physics, Chinese Academy of Sciences, China 
-
-> **Topics:** Deep learning theory, Generative models for physicists, Differentiable programming, Representation Learning. Examples to be covered: computation graph, automatic differentiation, variational inference, inverse Hamiltonian design. Applications of deep learning to statistical and quantum many-body physics. 
-
-
-[![Roger Melko](img/roger.jpg)](http://www.science.uwaterloo.ca/~rgmelko/) [**Roger Melko**](http://www.science.uwaterloo.ca/~rgmelko/) – Perimeter Institute and the University of Waterloo, Canada
-
-> **Topics:** Lattice models for statistical physics, Monte Carlo methods, supervised and unsupervised learning, neural networks, Boltzmann machines, and deep learning. 
-
-
-[![Eun-Ah Kim](img/eun.jpg)](https://physics.cornell.edu/eun-ah-kim) [**Eun-Ah Kim**](https://physics.cornell.edu/eun-ah-kim) – Cornell University, USA
-
-> **Topics:** Lattice models for statistical physics, Monte Carlo methods, supervised and unsupervised learning, neural networks, Boltzmann machines, and deep learning. 
