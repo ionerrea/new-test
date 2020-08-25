@@ -4,7 +4,7 @@ title: Developers
 ---
 
 
-[![Zohar Ringel](img/zohar.jpg)](http://www.phys.huji.ac.il/~zohar.ringel/) [**Zohar Ringel**](http://www.phys.huji.ac.il/~zohar.ringel/) – The Hebrew University of Jerusalem, Israel
+[![Ion Errea](img/Ion_Errea.jpg)](https://ionerrea.wordpress.com/) [**Ion Errea**](https://ionerrea.wordpress.com/) – University of the Basque Country (UPV/EHU), Donostia/San Sebastián, Spain
 
 > **Topics:** New results in ML: Mapping over-parameterized fixed-depth deep neural networks to Gaussian Processes. The Neural Tangent Kernel. Field theory description of over-parametrized networks. The information bottleneck. Identifying slow degrees of freedom, learning Exact Holomorphic Mappings in ADS/CFT.
 
