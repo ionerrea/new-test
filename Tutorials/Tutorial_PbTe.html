@@ -1,0 +1,1415 @@
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Pb-Te">Pb Te<a class="anchor-link" href="#Pb-Te">&#182;</a></h1><p>In this tutorial we will setup, from scratch, a calculation of Lead Telluride (PbTe).
+a thermoelectric material with a really high termoelectric efficiency.</p>
+<p>Here, for carriying out the calculations, we will use quantum-espresso, ASE and the SSCHA for thermondynamical properties.
+To setup ASE to work with espresso, please refer to the official guide:
+<a href="https://wiki.fysik.dtu.dk/ase/ase/calculators/espresso.html">https://wiki.fysik.dtu.dk/ase/ase/calculators/espresso.html</a></p>
+<p>I prepared a CIF of the experimental structure, you can download CIF files easily from online databases,
+or use ASE to build your own structure.
+In this case, the structure "PbTe.cif" has been downloaded from the American Minearologist Crystal Structure Database
+<a href="http://rruff.geo.arizona.edu/AMS/amcsd.php">http://rruff.geo.arizona.edu/AMS/amcsd.php</a>
+The pseudo-potentials used for the DFT calculation are located in pseudo_espresso, a full list of pseudos is available on the espresso 
+website.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Preparation">Preparation<a class="anchor-link" href="#Preparation">&#182;</a></h2><p>Both ASE and the SSCHA work in python, so we need to import them.
+Moreover, since we want to use quantum-espresso, we also import the Espresso calculation of ASE.
+This can be replaced your favorite calculator.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Load in the notebook all scientific libraries</span>
+<span class="c1"># It can be replaced with:</span>
+<span class="c1"># from numpy import *</span>
+<span class="c1"># import numpy as np</span>
+<span class="c1"># from matplotlib.pyplot import *</span>
+<span class="o">%</span><span class="k">pylab</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Using matplotlib backend: Qt5Agg
+Populating the interactive namespace from numpy and matplotlib
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span><span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">ase</span>
+<span class="kn">from</span> <span class="nn">ase.calculators.espresso</span> <span class="kn">import</span> <span class="n">Espresso</span>
+<span class="kn">from</span> <span class="nn">ase.visualize</span> <span class="kn">import</span> <span class="n">view</span>
+
+<span class="c1"># We import the basis modules for the SSCHA</span>
+<span class="kn">import</span> <span class="nn">cellconstructor</span> <span class="kn">as</span> <span class="nn">CC</span>
+<span class="kn">import</span> <span class="nn">cellconstructor.Structure</span>
+<span class="kn">import</span> <span class="nn">cellconstructor.Phonons</span>
+
+<span class="c1"># Import the SSCHA engine (we will use it later)</span>
+<span class="kn">import</span> <span class="nn">sscha</span><span class="o">,</span> <span class="nn">sscha.Ensemble</span><span class="o">,</span> <span class="nn">sscha.SchaMinimizer</span><span class="o">,</span> <span class="nn">sscha.Relax</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We will now setup the espresso calculator for ASE</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Lets define the pseudopotentials</span>
+<span class="n">pseudos</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Pb&quot;</span><span class="p">:</span> <span class="s2">&quot;Pb.upf&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;Te&quot;</span><span class="p">:</span> <span class="s2">&quot;Te.upf&quot;</span><span class="p">}</span>
+
+<span class="c1"># Now we define the parameters for the espresso calculations</span>
+<span class="n">input_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ecutwfc&quot;</span> <span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="c1"># The plane-wave wave-function cutoff</span>
+               <span class="s2">&quot;ecutrho&quot;</span><span class="p">:</span> <span class="mi">240</span><span class="p">,</span> <span class="c1"># The density wave-function cutoff,</span>
+               <span class="s2">&quot;conv_thr&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># The convergence for the DFT self-consistency</span>
+               <span class="s2">&quot;pseudo_dir&quot;</span> <span class="p">:</span> <span class="s2">&quot;pseudo_espresso&quot;</span><span class="p">,</span> <span class="c1"># The directory of the pseudo potentials</span>
+               <span class="s2">&quot;tprnfor&quot;</span> <span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="c1"># Print the forces</span>
+               <span class="s2">&quot;tstress&quot;</span> <span class="p">:</span> <span class="bp">True</span> <span class="c1"># Print the stress tensor</span>
+               <span class="p">}</span>
+
+<span class="n">k_spacing</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="c1">#A^-1 The minimum distance in the Brillouin zone sampling</span>
+
+<span class="n">espresso_calc</span> <span class="o">=</span> <span class="n">Espresso</span><span class="p">(</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">input_params</span><span class="p">,</span> <span class="n">pseudopotentials</span> <span class="o">=</span> <span class="n">pseudos</span><span class="p">,</span> <span class="n">kspacing</span> <span class="o">=</span> <span class="n">k_spacing</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We need to import the structure.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">PbTe_atoms</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;PbTe.cif&quot;</span><span class="p">)</span>
+
+<span class="c1"># We can view the structure</span>
+<span class="n">view</span><span class="p">(</span><span class="n">PbTe_atoms</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As you may have noticed, this structure is in the conventional cell.
+This is good for visualization purposes, but it makes calculations harder, as more atoms are present in the cell.
+So we redefine the new cell unsing cellconstructor to adapt system in the primitive cell.
+From an easy check on the structure, it is possible to recognize that the primitive vectors $\vec{v'}$ 
+can be obtained from the conventional vectors $v$ as follows:</p>
+$$
+\vec {v'}_1 = \frac 12 \left(\vec v_1 + \vec v_2\right)
+$$$$
+\vec {v'}_2 = \frac 12 \left(\vec v_1 - \vec v_2\right)
+$$$$
+\vec {v'}_3 = \frac 12 \left(\vec v_1 + \vec v_3\right)
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Initialize a Cellconstructor Structure</span>
+<span class="n">struct</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">Structure</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="n">struct</span><span class="o">.</span><span class="n">generate_from_ase_atoms</span><span class="p">(</span><span class="n">PbTe_atoms</span><span class="p">)</span>
+
+<span class="c1"># Define the new unit cell</span>
+<span class="n">new_cell</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unit_cell</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">new_cell</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">struct</span><span class="o">.</span><span class="n">unit_cell</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">struct</span><span class="o">.</span><span class="n">unit_cell</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>
+<span class="n">new_cell</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">struct</span><span class="o">.</span><span class="n">unit_cell</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">struct</span><span class="o">.</span><span class="n">unit_cell</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>
+<span class="n">new_cell</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">struct</span><span class="o">.</span><span class="n">unit_cell</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">struct</span><span class="o">.</span><span class="n">unit_cell</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span>
+
+<span class="c1"># Apply the new unit cell to the structure</span>
+<span class="c1"># And remove duplicated atoms</span>
+<span class="n">struct</span><span class="o">.</span><span class="n">unit_cell</span> <span class="o">=</span> <span class="n">new_cell</span>
+<span class="n">struct</span><span class="o">.</span><span class="n">fix_coords_in_unit_cell</span><span class="p">()</span>
+<span class="n">PbTe_primitive</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">get_ase_atoms</span><span class="p">()</span>
+
+<span class="n">view</span><span class="p">(</span><span class="n">PbTe_primitive</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can see that the new unit cell is much smaller than the previous one, and we actually have only two atoms per cell, 
+as we expect from a rock salt structure.</p>
+<p>We now need to relax the cell. We can perform this operation from quantum espresso,
+telling him to run a variable cell relaxation</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># We override (or add) the key for the calculation type</span>
+<span class="n">input_params</span><span class="p">[</span><span class="s2">&quot;calculation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vc-relax&quot;</span>
+<span class="c1"># Generate once again the Espresso calculator</span>
+<span class="n">espresso_calc</span> <span class="o">=</span> <span class="n">Espresso</span><span class="p">(</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">input_params</span><span class="p">,</span> <span class="n">pseudopotentials</span> <span class="o">=</span> <span class="n">pseudos</span><span class="p">,</span> <span class="n">kspacing</span> <span class="o">=</span> <span class="n">k_spacing</span><span class="p">)</span>
+
+<span class="c1"># We attach the calculator to the cell</span>
+<span class="n">PbTe_primitive</span><span class="o">.</span><span class="n">set_calculator</span><span class="p">(</span><span class="n">espresso_calc</span><span class="p">)</span>
+
+<span class="c1"># We run the relaxation</span>
+<span class="n">equilibrium_energy</span> <span class="o">=</span> <span class="n">PbTe_primitive</span><span class="o">.</span><span class="n">get_total_energy</span><span class="p">()</span> <span class="c1"># It should take few minutes</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Ase should have created an input file espresso.pwi that you can check</span>
+<span class="c1"># And redirect the output through espresso.pwo</span>
+<span class="c1"># This relaxation should have changed the structure</span>
+<span class="c1"># So we need to reload the structure from the output espresso file</span>
+<span class="n">PbTe_final</span><span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;espresso.pwo&quot;</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Volume before optimization: &quot;</span><span class="p">,</span> <span class="n">PbTe_primitive</span><span class="o">.</span><span class="n">get_volume</span><span class="p">(),</span> <span class="s2">&quot; A^3&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Volume after optimization: &quot;</span><span class="p">,</span> <span class="n">PbTe_final</span><span class="o">.</span><span class="n">get_volume</span><span class="p">(),</span> <span class="s2">&quot; A^3&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Volume before optimization:  63.71002599999998  A^3
+Volume after optimization:  67.90591056326011  A^3
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we have a structure in the primitive unit cell and relaxed.
+I remark that the convergence parameters I chose for the minimization are too low to get accurate results,
+especially for the variable cell relaxation, where the pressure is computed. Here the value of the pressure is overestimated by about 5 GPa, increase the wave-function cutoff to 70 Ry and the density cutoff to 280 Ry to get a more accurate result.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Harmonic-calculation">Harmonic calculation<a class="anchor-link" href="#Harmonic-calculation">&#182;</a></h3><p>Now we need to perform an harmonic calculation to get the spectra.
+This can be done with perturbation theory with quantum espresso, 
+or with phonopy if we want to use the finite displacement approach.</p>
+<p>I will show a very simple PDFT espresso run.
+We will compute the dynamical matrix on a 2x2x2 q mesh (equivalent of using a 2x2x2 supercell)
+and we will also compute effective charges as the system is an insulator.
+We will then save the results in harmonic_dyn filenames.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># We need an input file for phonon calculation in espresso.</span>
+<span class="n">ph_input</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&amp;inputph</span>
+<span class="s2">    ! the final filename</span>
+<span class="s2">    fildyn = &quot;harmonic_dyn&quot;</span>
+<span class="s2">    </span>
+<span class="s2">    ! the q mesh</span>
+<span class="s2">    ldisp = .true.</span>
+<span class="s2">    nq1 = 2 </span>
+<span class="s2">    nq2 = 2</span>
+<span class="s2">    nq3 = 2</span>
+<span class="s2">    </span>
+<span class="s2">    ! compute also the effective charges and the dielectric tensor</span>
+<span class="s2">    epsil = .true.</span>
+<span class="s2">&amp;end</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="c1"># We write the input script and execute the phonon calculation program</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;harmonic.phi&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ph_input</span><span class="p">)</span>
+
+<span class="c1"># Run the calculation</span>
+<span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;/usr/bin/mpirun -np 2 ph.x -npool 2 -i harmonic.phi &gt; harmonic.pho&quot;</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span> <span class="c1"># This command took with 4 i-7 processors about 5 minutes</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can see that espresso generated several files:
+harmonic_dyn0
+harmonic_dyn1 ...
+We will import them with CellConstructor.</p>
+<p>We need only to know the number of total q independent points by symmetries, that is,
+the total number of dynamical matrix printed by espresso (harmonic_dyn0 does not count).
+In this case, it should be 3.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Load the dynamical matrices just computed</span>
+<span class="n">harm_dyn</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">Phonons</span><span class="o">.</span><span class="n">Phonons</span><span class="p">(</span><span class="s2">&quot;harmonic_dyn&quot;</span><span class="p">,</span> <span class="n">nqirr</span> <span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># We load harmonic_dynX with X = 1,2,3</span>
+
+<span class="c1"># Now we can print all the phonon frequencies</span>
+<span class="n">w_s</span><span class="p">,</span> <span class="n">pols</span> <span class="o">=</span> <span class="n">harm_dyn</span><span class="o">.</span><span class="n">DiagonalizeSupercell</span><span class="p">()</span>
+<span class="c1"># By default, the dynamical matrix is written in Ry/bohr^2, so the energy is in Ry</span>
+<span class="c1"># To transform them in cm-1 we can use the conversion factor provided by CellConstructor</span>
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;{:.4f} cm-1&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">CC</span><span class="o">.</span><span class="n">Units</span><span class="o">.</span><span class="n">RY_TO_CM</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span>  <span class="n">w_s</span><span class="p">]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>-186.1459 cm-1
+-186.1459 cm-1
+-186.1459 cm-1
+-185.9474 cm-1
+-185.9474 cm-1
+-185.9474 cm-1
+-179.9445 cm-1
+-179.9445 cm-1
+-179.9445 cm-1
+-179.9445 cm-1
+-179.9445 cm-1
+-179.9445 cm-1
+-101.7456 cm-1
+-101.7456 cm-1
+-101.7456 cm-1
+-80.2691 cm-1
+-80.2691 cm-1
+-80.2691 cm-1
+-80.2691 cm-1
+-80.2691 cm-1
+-80.2691 cm-1
+48.0931 cm-1
+48.0931 cm-1
+48.0931 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+77.3157 cm-1
+77.3157 cm-1
+77.3157 cm-1
+77.3157 cm-1
+99.2432 cm-1
+99.2432 cm-1
+99.2432 cm-1
+99.2432 cm-1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>What a mess?! many frequencies are imaginary (printed as negative).
+We do not even have the acoustic frequencies at gamma equal to zero.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is due to two reasons:</p>
+<ol>
+<li>We have not converged parameters for the ab-initio simulation, so some of them may be artifact</li>
+<li>PbTe is a system with an incipient ferroelectric transition!</li>
+</ol>
+<p>The system wants to distort the cell to break the symmetries, so no matter how well we converge the phonon calculations,
+some imaginary frequencies will not be removed.</p>
+<p>This means that the structure is in a saddle-point of the Born-Oppenheimer (BO) energy landscape.
+However, PbTe is found in this structure even at T = 0 K experimentally.
+How is this possible? It is anharmonicity and quantum zero-point motion that stabilize the structure.</p>
+<p>Luckily, the SSCHA is made to deal with this kind of system.</p>
+<p>Note that the presence of imaginary frequencies prevents the application of any harmonic approximation.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="The-Self-Consistent-Harmonic-Approximation">The Self-Consistent Harmonic Approximation<a class="anchor-link" href="#The-Self-Consistent-Harmonic-Approximation">&#182;</a></h1><p>Now we have all the ingredients to start a SSCHA calculation.
+The SSCHA finds the optimal gaussian density matrix that minimizes the free energy of the system:
+$$
+\rho_{\mathcal R, \Upsilon}(\vec R) = \sqrt{\det(\Upsilon / 2\pi)} \exp \left[ -\frac 12 \sum_{\alpha\beta} (R_\alpha - \mathcal{R}_\alpha)\Upsilon_{\alpha\beta}(R_\beta - \mathcal{R}_\beta)\right]
+$$
+where $\mathcal{R}$ and $\Upsilon$ are, respectively, the average centroid position and the 
+covariance matrix of the gaussian, while $\alpha,\beta=1\cdots 3N$ rum on both the atomic and the cartesian coordinates.</p>
+<p>In the specific case, the $\rho_{\mathcal R, \Upsilon}(\vec R)$ density matrix can be represented by a positive definite dynamical matrix.
+In fact, the equilibrium density matrix of any harmnic Hamiltonian is a gaussian. Our density matrix is related one to one to
+an auxiliary harmonic hamiltonian $\mathcal H_{\mathcal R, \Upsilon}$.
+$$
+\rho_{\mathcal R, \Upsilon} \longleftrightarrow \mathcal H_{\mathcal R, \Upsilon}
+$$</p>
+<h2 id="Preparation-of-the-data">Preparation of the data<a class="anchor-link" href="#Preparation-of-the-data">&#182;</a></h2><p>First, we need to obtain a good starting point for our density matrix $\rho$.
+We can use the harmonic dynamical matrix we computed on the previous step (harmnic_dyn).</p>
+<p>There is a problem: an harmonic hamiltonian must be positive definite to generate a density matrix, 
+and the PbTe harmonic hamiltonian is not.
+Do not worry, the CellConstructor has a nice tool to force a dynamical matrix to be positive definite</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Load the dynamical matrix </span>
+<span class="n">dyn</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">Phonons</span><span class="o">.</span><span class="n">Phonons</span><span class="p">(</span><span class="s2">&quot;harmonic_dyn&quot;</span><span class="p">,</span> <span class="n">nqirr</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Apply the sum rule and symmetries</span>
+<span class="n">dyn</span><span class="o">.</span><span class="n">Symmetrize</span><span class="p">()</span>
+
+<span class="c1"># Flip the imaginary frequencies into real ones</span>
+<span class="n">dyn</span><span class="o">.</span><span class="n">ForcePositiveDefinite</span><span class="p">()</span>
+
+<span class="c1"># We can print the frequencies to show the magic:</span>
+<span class="n">w_s</span><span class="p">,</span> <span class="n">pols</span> <span class="o">=</span> <span class="n">dyn</span><span class="o">.</span><span class="n">DiagonalizeSupercell</span><span class="p">()</span>
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;{:.4f} cm-1&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">CC</span><span class="o">.</span><span class="n">Units</span><span class="o">.</span><span class="n">RY_TO_CM</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span>  <span class="n">w_s</span><span class="p">]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0.0000 cm-1
+0.0000 cm-1
+0.0000 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+52.7799 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+55.6362 cm-1
+77.3157 cm-1
+77.3157 cm-1
+77.3157 cm-1
+77.3157 cm-1
+80.2691 cm-1
+80.2691 cm-1
+80.2691 cm-1
+80.2691 cm-1
+80.2691 cm-1
+80.2691 cm-1
+99.2432 cm-1
+99.2432 cm-1
+99.2432 cm-1
+99.2432 cm-1
+101.7456 cm-1
+101.7456 cm-1
+101.7456 cm-1
+179.9445 cm-1
+179.9445 cm-1
+179.9445 cm-1
+179.9445 cm-1
+179.9445 cm-1
+179.9445 cm-1
+186.1459 cm-1
+186.1459 cm-1
+186.1459 cm-1
+187.8042 cm-1
+187.8042 cm-1
+187.8042 cm-1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As you can see, we eliminated the imaginary frquencies. This is no more the harmonic dynamical matrix, however it is a good starting point for defining the density matrix $\rho_{\mathcal R, \Upsilon}(R)$.</p>
+<h2 id="The-stochastic-approach">The stochastic approach<a class="anchor-link" href="#The-stochastic-approach">&#182;</a></h2><p>To solve the self-consistent harmonic approximation we use a stochastic approach: we generate random ionic configurations distributed according to $\rho_{\mathcal R, \Upsilon}$ so that we can compute the free energy as
+$$
+F_{\mathcal R, \Upsilon} = F[{\mathcal H}_{\mathcal R, \Upsilon}] + \left&lt;V(R) - \mathcal V(R)\right&gt;_{\rho_{\mathcal R, \Upsilon}}
+$$</p>
+<p>Here $F[\mathcal H_{\mathcal R, \Upsilon}]$ is the free energy of the auxiliary harmonic hamiltonian $\mathcal H_{\mathcal R, \Upsilon}$, 
+$V(R)$ is the BO energy landscape, $\mathcal V(R)$ is the harmonic potential of the auxiliary hamiltonian $\mathcal H_{\mathcal R, \Upsilon}$ and $\left&lt;\cdot\right&gt;_{\rho_{\mathcal R, \Upsilon}}$ is the average over the $\rho_{\mathcal R, \Upsilon}$ density matrix.</p>
+<p>So we need to generate the random ensemble.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># We setup an ensemble for the SSCHA at T = 100 K using the density matrix  from the dyn dynamical matrix</span>
+<span class="n">ensemble</span> <span class="o">=</span> <span class="n">sscha</span><span class="o">.</span><span class="n">Ensemble</span><span class="o">.</span><span class="n">Ensemble</span><span class="p">(</span><span class="n">dyn</span><span class="p">,</span> <span class="n">T0</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">supercell</span><span class="o">=</span> <span class="n">dyn</span><span class="o">.</span><span class="n">GetSupercell</span><span class="p">())</span>
+
+<span class="c1"># We generate 10 randomly displaced structures in the supercell</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> 
+
+<span class="c1"># We can look at one configuration to have an idea on how they look like</span>
+<span class="c1"># Hint: try to raise the temperature to 1000 K or 2000 K if you want to see a bigger distortion on the lattice</span>
+<span class="n">view</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">structures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_ase_atoms</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We need to compute the quantity $V(R)$ (the energy) and its gradient (the atomic forces) for each configuration.</p>
+<p>This can be done in many ways. You can do it manually:
+You can save the ensemble as text files with the atomic coordinates and cell in this way and use your own scripts to copy that on a cluster, setup your DFT calculation, parse the output files and copy them back here, or you can pass to the ensemble class the ASE calculator object, and it will compute automatically energy and forces.
+It is also possible to configure a cluster for a remote calculation so that the code will automatize anything.
+In the following subsections I will follow all the possibilities, you can jump directly to the section you are more interested in.</p>
+<h3 id="The-ASE-automatic-calculation-(local)">The ASE automatic calculation (local)<a class="anchor-link" href="#The-ASE-automatic-calculation-(local)">&#182;</a></h3><p>We start with the easiest possible thing. We already performed the calculation using ASE for the cell relaxation, we will setup it
+now for a simple total energy DFT calculation, attach to our ensemble variable and compute the ensemble.</p>
+<p><strong>NOTE</strong>: Sometimes calculators can fails randomly, therefore, the ensemble will automatically resubmit a calculation if it fails for 5 times. If 5 consecutive fails are found, then the calculation results in a crash.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Lets setup the espresso calculator for ASE</span>
+<span class="c1"># (You can substitute the following two lines with the calculator you prefer)</span>
+<span class="n">input_params</span><span class="p">[</span><span class="s2">&quot;calculation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;scf&quot;</span> <span class="c1"># Setup the simple DFT calculation</span>
+
+<span class="n">espresso_calc</span> <span class="o">=</span> <span class="n">Espresso</span><span class="p">(</span><span class="n">pseudopotentials</span> <span class="o">=</span> <span class="n">pseudos</span><span class="p">,</span> <span class="n">input_data</span> <span class="o">=</span> <span class="n">input_params</span><span class="p">,</span> <span class="n">kspacing</span> <span class="o">=</span> <span class="n">k_spacing</span><span class="p">,</span> <span class="n">koffset</span> <span class="o">=</span> <span class="n">k_offset</span><span class="p">)</span>
+
+<span class="c1"># Now we use the espresso calculator to compute all the configurations</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">compute_ensemble</span><span class="p">(</span><span class="n">espresso_calc</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>conf 0 / 10
+conf 1 / 10
+conf 2 / 10
+conf 3 / 10
+conf 4 / 10
+conf 5 / 10
+conf 6 / 10
+conf 7 / 10
+conf 8 / 10
+conf 9 / 10
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Now we can save the ensemble, to reload it in any later moment</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data_ensemble_ASE&quot;</span><span class="p">,</span> <span class="n">population</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-manual-calculation-(local-or-on-a-cluster)">The manual calculation (local or on a cluster)<a class="anchor-link" href="#The-manual-calculation-(local-or-on-a-cluster)">&#182;</a></h3><p>Here we print on separated text file the atomic positions and the cell.
+We then need to parse with a script the ensemble to generate an input file for our favourite calculator, submit the calculation (it can be done on a cluster), and then parse the output files to obtain forces, energies and the stress tensors.</p>
+<p>I will present an example for quantum espresso, however, you can easily implement your scripts to work with your own code.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># We save the ensemble as it is, before computing the forces</span>
+<span class="c1"># The population flag allows us to save several ensembles inside the same directory</span>
+<span class="c1"># As the SSCHA is an iterative algorithm, we may need more steps to converge,</span>
+<span class="c1"># in this way we can save all the ensembles of the same SSCHA calculation inside the same directory</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data_ensemble_manual&quot;</span><span class="p">,</span> <span class="n">population</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now lets have a look on what files the code created insode data_ensemble_manual.
+The files we are interested in are:</p>
+
+<pre><code>u_population1_X.dat  
+scf_population1_X.dat   
+forces_population1_X.dat   
+pressures_population1_X.dat    
+energies_supercell_population1.dat
+
+</code></pre>
+<p>In particular, the scf_population1_X.dat files contain the structures in the scf file format, that contains the info on the atomic position of each atom in the supercell written in alat units. The alat is a generic unit written on the first dynamical matrix used to generate the ensemble.
+It is stored in ensemble.dyn.alat in Angstrom, or it is the fourth value of the dynamical matrix in the quantum espresso format (expressed in Bohr)</p>
+<p>This is the file to parse in order to setup an input file for the total energy calculation.
+the forces_population1_X.dat and pressures_population1_X.dat are empty (filled with zeros).
+You must write on these files the forces on each atom and the stress tensor of the correspondint scf_population1_X.dat configuration.
+Similarly, energies_supercell_population1.dat must contain all the energies of the scf_population1_X.dat ordered as the X index.</p>
+<p><strong>Important:</strong> the units must be for energies Ry, for forces Ry/bohr and for stress tensors Ry/bohr^3</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Ok now we will use python to to parse the ensemble and generate input files for the ab-initio run</span>
+
+<span class="c1"># First of all, we must prepare a generic header for the calculation</span>
+<span class="n">typical_espresso_header</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&amp;control</span>
+<span class="s2">    calculation = &quot;scf&quot;</span>
+<span class="s2">    tstress = .true.</span>
+<span class="s2">    tprnfor = .true.</span>
+<span class="s2">    disk_io = &quot;none&quot;</span>
+<span class="s2">    pseudo_dir = &quot;pseudo_espresso&quot;</span>
+<span class="s2">&amp;end</span>
+<span class="s2">&amp;system</span>
+<span class="s2">    nat = {}</span>
+<span class="s2">    ntyp = 2</span>
+<span class="s2">    ibrav = 0</span>
+<span class="s2">    ecutwfc = 40</span>
+<span class="s2">    ecutrho = 160</span>
+<span class="s2">&amp;end</span>
+<span class="s2">&amp;electrons</span>
+<span class="s2">    conv_thr = 1d-6</span>
+<span class="s2">    !diagonalization = &quot;cg&quot;</span>
+<span class="s2">&amp;end</span>
+
+<span class="s2">ATOMIC_SPECIES</span>
+<span class="s2">Pb 207.2 Pb.upf</span>
+<span class="s2">Te 127.6 Te.upf</span>
+
+<span class="s2">K_POINTS automatic</span>
+<span class="s2">1 1 1 0 0 0</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">structures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">N_atoms</span><span class="p">)</span> 
+<span class="c1"># We extract the number of atoms form the ensemble and the celldm(1) from the dynamical matrix (it is stored in Angstrom, but espresso wants it in Bohr)</span>
+<span class="c1"># You can also read it on the fourth value of the first data line on the first dynamical matrix file (dyn_start_popilation1_1); In the latter case, it will be already in Bohr.</span>
+
+<span class="c1"># Now we need to read the scf files</span>
+<span class="c1"># </span>
+<span class="n">all_scf_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data_ensemble_manual&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;data_ensemble_manual&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;scf_&quot;</span><span class="p">)]</span>
+
+<span class="c1"># In the previous line  I am reading all the files inside data_ensemble_manual os.listdir(data_ensemble_manual) and iterating over them (the f variable)</span>
+<span class="c1"># I iterate only on the filenames that starts with scf_ </span>
+<span class="c1"># Then I join the directory name data_ensemble_manual to f. In unix it will be equal to data_ensemble_manual/scf_....</span>
+<span class="c1"># (using os.path.join to concatenate path assure to have the correct behaviour independently on the operating system</span>
+
+<span class="c1"># We will generate the input file in a new directory</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;run_calculation&quot;</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s2">&quot;run_calculation&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">all_scf_files</span><span class="p">:</span>
+    <span class="c1"># Now we are cycling on the scf_ files we found.</span>
+    <span class="c1"># We must extract the number of the file</span>
+    <span class="c1"># The file is the string &quot;data_ensemble_manual/scf_population1_X.dat&quot;</span>
+    <span class="c1"># Therefore the X number is after the last &quot;_&quot; and before the &quot;.&quot; character</span>
+    <span class="c1"># We can split before the string file at each &quot;_&quot;, isolate the last part &quot;X.dat&quot;</span>
+    <span class="c1"># and then split it again on &quot;.&quot; (obtaining [&quot;X&quot;, &quot;dat&quot;]) and select the first element</span>
+    <span class="c1"># then we convert the &quot;X&quot; string into an integer</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="c1"># We decide the filename for the espresso input</span>
+    <span class="c1"># We will call it run_calculation/espresso_run_X.pwi</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;run_calculation&quot;</span><span class="p">,</span> <span class="s2">&quot;espresso_run_{}.pwi&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">number</span><span class="p">))</span>
+    
+    <span class="c1"># We start writing the file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># We write the header</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">typical_espresso_header</span><span class="p">)</span>
+        
+        <span class="c1"># Load the scf_population_X.dat file</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">structure_lines</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="c1"># Write the content on the espresso_run_X.pwi file</span>
+        <span class="c1"># Note in the files we specify the units for both the cell and the structure [Angstrom]</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">structure_lines</span><span class="p">)</span>
+        
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The previous code will generate the input files inside a directory run_calculation for quantum espresso.
+You can copy them to your cluster, submit a job, and copy back the results.
+For completeness, the next cell of code will perform the calculation locally, it could require some time.
+If you pass them to a supercomputer, remember to copy also the pseudos!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">directory</span> <span class="o">=</span> <span class="s2">&quot;run_calculation&quot;</span>
+<span class="c1"># Copy the pseudo</span>
+<span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+    <span class="c1"># Skip anything that is not an espresso input file</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pwi&quot;</span><span class="p">):</span>
+        <span class="k">continue</span> 
+        
+    <span class="n">outputname</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.pwi&quot;</span><span class="p">,</span> <span class="s2">&quot;.pwo&quot;</span><span class="p">)</span>
+    
+    <span class="n">total_inputname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="nb">file</span><span class="p">)</span>
+    <span class="n">total_outputname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">outputname</span><span class="p">)</span>
+    
+    <span class="c1"># Run the calculation</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;/usr/bin/mpirun -np 4 pw.x -i {} &gt; {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_inputname</span><span class="p">,</span> <span class="n">total_outputname</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Running: &quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span> <span class="c1"># On my laptop with 4 processors (i7) it takes about 1 minute for configuration</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_3.pwi &gt; run_calculation/espresso_run_3.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_9.pwi &gt; run_calculation/espresso_run_9.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_4.pwi &gt; run_calculation/espresso_run_4.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_8.pwi &gt; run_calculation/espresso_run_8.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_10.pwi &gt; run_calculation/espresso_run_10.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_6.pwi &gt; run_calculation/espresso_run_6.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_7.pwi &gt; run_calculation/espresso_run_7.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_1.pwi &gt; run_calculation/espresso_run_1.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_2.pwi &gt; run_calculation/espresso_run_2.pwo
+Running:  /usr/bin/mpirun -np 4 pw.x -i run_calculation/espresso_run_5.pwi &gt; run_calculation/espresso_run_5.pwo
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Either we run the calculation locally or we copied in a cluster and runned there, now we have the output files
+inside the directory, we need to retrive the energies, forces, and the stress tensor (if any).</p>
+<p>As written, we must convert the total energy of the supercell in Ry, the forces in Ry/bohr and the stress in Ry/bohr^3.
+Luckyly quantum espresso already gives these qantities in the correct units, but be carefull when using different calculators.
+This problem does not arise when using ASE, as the sscha will automatically convert the ASE units to the correct one.
+Now we will parse the espresso output looking for the energy, the forces and the stress</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">directory</span> <span class="o">=</span> <span class="s2">&quot;run_calculation&quot;</span>
+<span class="n">output_filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pwo&quot;</span><span class="p">)]</span> <span class="c1"># We select only the output files</span>
+<span class="n">output_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">output_filenames</span><span class="p">]</span> <span class="c1"># We add the directory/outpufilename to load them correctly</span>
+
+<span class="c1"># We prepare the array of energies</span>
+<span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">output_files</span><span class="p">))</span> 
+<span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">output_files</span><span class="p">:</span>
+    <span class="c1"># Get the number of the configuration.</span>
+    <span class="n">id_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># The same as before, we need the to extract the configuration number from the filename</span>
+    
+    <span class="c1"># Load the file</span>
+    <span class="n">ff</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ff</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span> <span class="c1"># Read the whole file removing tailoring spaces</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+    <span class="c1"># Lets look for the energy (in espresso the first line that starts with !)</span>
+    <span class="c1"># next is used to find only the first occurrence</span>
+    <span class="n">energy_line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Lets collect the energy (the actual number is the 5th item on the line, but python indexes start from 0)</span>
+    <span class="c1"># note, also the id_number are saved starting from 1</span>
+    <span class="n">energies</span><span class="p">[</span><span class="n">id_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">energy_line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">4</span><span class="p">])</span>
+    
+    <span class="c1"># Now we can collect the force</span>
+    <span class="c1"># We need the number of atoms</span>
+    <span class="n">nat_line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span> <span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span> <span class="ow">and</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;atoms/cell&quot;</span> <span class="p">)</span>
+    <span class="n">nat</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nat_line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">4</span><span class="p">])</span>
+    
+    <span class="c1"># Now allocate the forces and read them</span>
+    <span class="n">forces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nat</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">forces_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;atom&quot;</span><span class="p">]</span> <span class="c1"># All the lines that starts with atom will contain a force</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nat</span><span class="p">):</span>
+        <span class="n">forces</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">forces_lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]]</span> <span class="c1"># Get the last three number from the line containing the force</span>
+    
+    <span class="c1"># Now we can take the stress tensor</span>
+    <span class="n">stress</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="c1"># We pick the index of the line that starts with the words total stress</span>
+    <span class="n">index_before_stress</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;total&quot;</span> <span class="ow">and</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;stress&quot;</span><span class="p">)</span>
+    <span class="c1"># The stress tensor is located just after it</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">index_before_stress</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">stress</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]]</span>
+
+    <span class="c1"># We can save the forces_population1_X.dat and pressures_population1_X.dat files</span>
+    <span class="n">force_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data_ensemble_manual&quot;</span><span class="p">,</span> <span class="s2">&quot;forces_population1_{}.dat&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id_number</span><span class="p">))</span>
+    <span class="n">stress_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data_ensemble_manual&quot;</span><span class="p">,</span> <span class="s2">&quot;pressures_population1_{}.dat&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id_number</span><span class="p">))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">force_file</span><span class="p">,</span> <span class="n">forces</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">stress_file</span><span class="p">,</span> <span class="n">stress</span><span class="p">)</span>
+
+<span class="c1"># Now we read all the configurations, we can save the energy file</span>
+<span class="n">energy_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data_ensemble_manual&quot;</span><span class="p">,</span> <span class="s2">&quot;energies_supercell_population1.dat&quot;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">energy_file</span><span class="p">,</span> <span class="n">energies</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we have collected back the ensemble, and we can load it into the sscha once again.
+This time, when we load the ensemble, we need also to specify the number of configurations</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[60]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ensemble</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data_ensemble_manual&quot;</span><span class="p">,</span> <span class="n">population</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-automatic-submission-to-a-cluster">The automatic submission to a cluster<a class="anchor-link" href="#The-automatic-submission-to-a-cluster">&#182;</a></h3><p>The python-sscha code implements also the possibility send the calculation to a remote cluster.
+This option is really usefull, as installing the full sscha package on a cluster may be cumbersome.</p>
+<p>With this option we will run all the SSCHA locally, and submit to the cluster only the DFT calculations.
+This option is compatible with queue systems as SLURM and PBS.</p>
+<p>First, we need to initialize the cluster, specifying all the relevant variables.
+Here I will use the example of the MARCONI HPC of the CINECA, but can be easily modified to 
+be runned on most clusters (tested in the spanish MARENOSTRUM, the franch CURIE and IRENE)</p>
+<p><strong>NOTE:</strong> at the release date Jannuary 2020, the automatic submission on a cluster is implemented only with quantum-espresso.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[40]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Here we configure the cluster object MARCONI</span>
+<span class="kn">import</span> <span class="nn">sscha.Cluster</span>
+
+<span class="n">my_hpc</span> <span class="o">=</span> <span class="n">sscha</span><span class="o">.</span><span class="n">Cluster</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="n">pwd</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+
+<span class="c1"># We setup the connection info</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="s2">&quot;login.marconi.cineca.it@lmonacel&quot;</span> <span class="c1"># The command to connect via ssh to the cluster</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">account_name</span> <span class="o">=</span> <span class="s2">&quot;IscrB_COMRED&quot;</span> <span class="c1"># The name of the project for the computation</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="s2">&quot;/marconi_work/IscrB_COMRED/lmonacel/workdir&quot;</span> <span class="c1"># the directory in which the calculations are performed</span>
+
+<span class="c1"># Now we need to setup the espresso</span>
+<span class="c1"># First we must tell the cluster where to find him:</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s2">&quot;pw.x -npool NPOOL -i  PREFIX.pwi &gt; PREFIX.pwo&quot;</span>
+<span class="c1"># Then we need to specify if some modules must be loaded in the submission script</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">load_modules</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"># Here this is a bash script at the beginning of the submission</span>
+<span class="s2"># We can load modules</span>
+
+<span class="s2">module load espresso</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="c1"># All these information are independent from the calculation</span>
+<span class="c1"># Now we need some more specific info, like the number of processors, pools and other stuff</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">n_cpu</span> <span class="o">=</span> <span class="mi">32</span> <span class="c1"># We will use 32 processors</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">n_nodes</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#In 1 node</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">n_pool</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># This is an espresso specific tool, the parallel CPU are divided in 4 pools</span>
+
+<span class="c1"># We can also choose in how many batch of jobs we want to submit simultaneously, and how many configurations for each job</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">job_number</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="c1"># In this way we submit 40 jobs, each one with 10 configurations</span>
+
+<span class="c1"># We can specify the time limit for each job,</span>
+<span class="n">my_hpc</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="s2">&quot;00:30:00&quot;</span> <span class="c1"># 30 minutes</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Now we can compute the ensemble using this cluster configuration, in a similar way we made with ASE:</span>
+<span class="c1"># We generate the ASE espresso calculator</span>
+<span class="n">input_params</span><span class="p">[</span><span class="s2">&quot;calculation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;scf&quot;</span> <span class="c1"># Setup the simple DFT calculation</span>
+
+<span class="n">espresso_calc</span> <span class="o">=</span> <span class="n">Espresso</span><span class="p">(</span><span class="n">pseudopotentials</span> <span class="o">=</span> <span class="n">pseudos</span><span class="p">,</span> <span class="n">input_data</span> <span class="o">=</span> <span class="n">input_params</span><span class="p">,</span> <span class="n">kspacing</span> <span class="o">=</span> <span class="n">k_spacing</span><span class="p">,</span> <span class="n">koffset</span> <span class="o">=</span> <span class="n">k_offset</span><span class="p">)</span>
+
+<span class="c1"># Now we use the espresso calculator with the cluster to send the calculation in the remote cluster.</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">compute_ensemble</span><span class="p">(</span><span class="n">espresso_calc</span><span class="p">,</span> <span class="n">cluster</span> <span class="o">=</span> <span class="n">my_hpc</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The last line will do the job. It will establish a connection to the cluster, prepare all the input files, send them,
+submit them through a slurm queue system, and collect them back. 
+The interesting feature of this procedure is that if some calculation fails, the automatic process will automatically resubmit it up to five times (this number can be changed as it is a property of the cluster, to avoid wasting cputime if we setup a too low time limit. The variable is my_hpc.max_recalc.</p>
+<p>You will need a passwordless connection to use the cluster in this way. However, some cluster does not allow passwordless connections.
+In this case, you can specify the pwd in the cluster initialization:</p>
+<div class="highlight"><pre><span></span><span class="n">my_hcp</span> <span class="o">=</span> <span class="n">sscha</span><span class="o">.</span><span class="n">Cluster</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="n">pwd</span><span class="o">=</span><span class="s2">&quot;mybeautifullpassword&quot;</span><span class="p">)</span>
+</pre></div>
+<p>This is not the best thing to do, as your password will be stored in clear text, and easily stolen from you. So before using this command check if it is really impossible to establish a passwordless connection.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># We can save the ensemble for further processing</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data_ensemble_cluster&quot;</span><span class="p">,</span> <span class="n">population</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="The-SSCHA-minimization">The SSCHA minimization<a class="anchor-link" href="#The-SSCHA-minimization">&#182;</a></h1><p>In the previous section we initialized the starting density matrix $\rho_{\mathcal R,\Upsilon}$, 
+and we generated a randomly distributed ensemble. Then we used quantum-espresso to compute the energies, forces and the stress from it.</p>
+<p>In this section we will use the extracted ensemble to optimize the density matrix $\rho_{\mathcal R, \Upsilon}$ in order to minimize the free energy.
+The minimization will continue until both we converge to a minimum, or our ensemble degradates.
+Ensemble degradation occurs when our updated parameters $\mathcal R$ and $\Upsilon$ changes a lot with respect to the original value used to generate the ensemble.</p>
+<p>In this case the $\mathcal R$ are fixed by symmetry, so our only degrees of freedom are in the $\Upsilon$ matrix.
+therefore we force the system to ignore $\mathcal R$ for the minimization convergence.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Lets reset other calculation if you run this cell multiple times</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">update_weights</span><span class="p">(</span><span class="n">dyn</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="c1"># Restore the original density matrix at T = 100 K</span>
+<span class="n">minimizer</span> <span class="o">=</span> <span class="n">sscha</span><span class="o">.</span><span class="n">SchaMinimizer</span><span class="o">.</span><span class="n">SSCHA_Minimizer</span><span class="p">(</span><span class="n">ensemble</span><span class="p">)</span>
+
+<span class="c1"># Ignore the structure minimization (is fixed by symmetry)</span>
+<span class="n">minimizer</span><span class="o">.</span><span class="n">minim_struct</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c1"># Setup the minimization parameter for the covariance matrix</span>
+<span class="n">minimizer</span><span class="o">.</span><span class="n">min_step_dyn</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="c1"># Values around 1 are good</span>
+<span class="c1">#minimizer.precond_dyn = False</span>
+<span class="c1">#minimizer.root_representation = &quot;root2&quot;</span>
+
+<span class="c1"># Setup the threshold for the ensemble wasting</span>
+<span class="n">minimizer</span><span class="o">.</span><span class="n">kong_liu_ratio</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="c1"># Usually 0.5 is a good value</span>
+
+<span class="c1"># Lest start the minimization</span>
+<span class="n">minimizer</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+<span class="n">minimizer</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The privious calculation will print a lot of info on the standard output as the minimization goes.
+However, after it finishes, you can plot the major features to have a hint of what happened:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[55]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">minimizer</span><span class="o">.</span><span class="n">plot_results</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here you see several plots as a function of the minimization steps. 
+The first one is the total Free energy (including anharmonic contributions) 
+The second plot is the modulus of the free energy gradient with respect to the covariance $\Upsilon$ matrix. 
+The third plot is the modulus of the free energy gradient with respect to the average atomic position $\mathcal R$.
+The final plot is a measurement of the ensemble degradance.
+You can notice that the gradient of the atomic position is always 0, this reflects the fact that the average position of the atoms must keep the
+frequencies.</p>
+<p>You can also explicitly interrogate the code for quantities like Free energy and Stress tensor now that the system is ended.
+To print some generic info you can use the finalize() method. Otherwise you can access to specific quantities:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[56]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">minimizer</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+ * * * * * * * * 
+ *             * 
+ *   RESULTS   * 
+ *             * 
+ * * * * * * * * 
+
+
+Minimization ended after 10 steps
+
+Free energy = -4767586.25400589 +-       1.18792173 meV
+FC gradient modulus =   19709.10738392 +-       0.16384031 bohr^2
+Struct gradient modulus =       0.00000000 +-       0.00000000 meV/A
+Kong-Liu effective sample size =  3.204267119925592
+
+
+ ==== STRESS TENSOR [GPa] ==== 
+      4.37878027      0.00000000     -0.00000000                0.01248128      0.00000000      0.00000000
+      0.00000000      4.37878027     -0.00000000    +-          0.00000000      0.01248128      0.00000000
+     -0.00000000      0.00000000      4.37878027                0.00000000      0.00000000      0.01248128
+
+ Ab initio average stress [GPa]:
+      4.36834543      0.00000000     -0.00000000
+      0.00000000      4.36834543     -0.00000000
+     -0.00000000     -0.00000000      4.36834543
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[57]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;The total free energy per unit cell is:&quot;</span><span class="p">,</span> <span class="n">minimizer</span><span class="o">.</span><span class="n">get_free_energy</span><span class="p">(),</span> <span class="s2">&quot; Ry&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;The total stress tensor is [Ry/bohr^3]:&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">minimizer</span><span class="o">.</span><span class="n">get_stress_tensor</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;And the stochastic error on the stress tensor is:&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">minimizer</span><span class="o">.</span><span class="n">get_stress_tensor</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;The stocastic error of the free energy instead, was:&quot;</span><span class="p">,</span> <span class="n">minimizer</span><span class="o">.</span><span class="n">get_free_energy</span><span class="p">(</span><span class="n">return_error</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot; Ry&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The total free energy per unit cell is: -350.4109991915717  Ry
+The total stress tensor is [Ry/bohr^3]:
+[[ 2.97663324e-04  2.71050543e-20 -1.35525272e-19]
+ [ 2.71050543e-20  2.97663324e-04 -2.71050543e-20]
+ [-2.16840434e-19  2.71050543e-20  2.97663324e-04]]
+And the stochastic error on the stress tensor is:
+[[8.48460188e-07 0.00000000e+00 0.00000000e+00]
+ [0.00000000e+00 8.48460188e-07 0.00000000e+00]
+ [0.00000000e+00 0.00000000e+00 8.48460188e-07]]
+The stocastic error of the free energy instead, was: 8.731060497873162e-05  Ry
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Saving-the-results">Saving the results<a class="anchor-link" href="#Saving-the-results">&#182;</a></h2><p>We completed the minimization, now we can save the final results.
+In particular we can save the density matrix $\rho_{\mathcal R, \Upsilon}$. The important quantities are the average atomic positions,
+and the covariance matrix.</p>
+<p>These two quantities are both stored inside the auxiliary dynamical matrix. We can access it through:</p>
+<div class="highlight"><pre><span></span><span class="n">minimizer</span><span class="o">.</span><span class="n">dyn</span>
+</pre></div>
+<p>We can, for example, show new average structure (in this case will be equal to the begining one, as it is fixed by symmetry) and print the frequencies of the effective matrix, to see how they changed.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[60]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Draw the 3D structure of the final average atomic positions</span>
+<span class="n">view</span><span class="p">(</span><span class="n">minimizer</span><span class="o">.</span><span class="n">dyn</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">get_ase_atoms</span><span class="p">())</span>
+
+<span class="c1"># We can save the dynamical matrix</span>
+<span class="n">minimizer</span><span class="o">.</span><span class="n">dyn</span><span class="o">.</span><span class="n">save_qe</span><span class="p">(</span><span class="s2">&quot;dyn_pop1_&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print the frequencies before and after the minimization</span>
+<span class="n">w_old</span><span class="p">,</span> <span class="n">p_old</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">dyn_0</span><span class="o">.</span><span class="n">DiagonalizeSupercell</span><span class="p">()</span> <span class="c1"># This is the representation of the density matrix used to generate the ensemble</span>
+<span class="n">w_new</span><span class="p">,</span> <span class="n">p_new</span> <span class="o">=</span> <span class="n">minimizer</span><span class="o">.</span><span class="n">dyn</span><span class="o">.</span><span class="n">DiagonalizeSupercell</span><span class="p">()</span>
+
+<span class="c1"># We can now print them </span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot; Old frequencies |  New frequencies&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;{:16.4f} | {:16.4f}  cm-1&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">w_old</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">CC</span><span class="o">.</span><span class="n">Units</span><span class="o">.</span><span class="n">RY_TO_CM</span><span class="p">,</span> <span class="n">w_new</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">CC</span><span class="o">.</span><span class="n">Units</span><span class="o">.</span><span class="n">RY_TO_CM</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w_old</span><span class="p">))]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre> Old frequencies |  New frequencies
+          0.0000 |          -0.0000  cm-1
+          0.0000 |          -0.0000  cm-1
+          0.0000 |           0.0000  cm-1
+         52.7799 |          51.2496  cm-1
+         52.7799 |          51.2496  cm-1
+         52.7799 |          51.2496  cm-1
+         52.7799 |          51.2496  cm-1
+         52.7799 |          51.2496  cm-1
+         52.7799 |          51.2496  cm-1
+         52.7799 |          51.2496  cm-1
+         52.7799 |          51.2496  cm-1
+         55.6362 |          56.2187  cm-1
+         55.6362 |          56.2187  cm-1
+         55.6362 |          56.2187  cm-1
+         55.6362 |          56.2187  cm-1
+         55.6362 |          56.2187  cm-1
+         55.6362 |          56.2187  cm-1
+         55.6362 |          56.2187  cm-1
+         55.6362 |          56.2187  cm-1
+         77.3157 |          60.2082  cm-1
+         77.3157 |          60.2082  cm-1
+         77.3157 |          60.2082  cm-1
+         77.3157 |          60.2082  cm-1
+         80.2691 |          60.2082  cm-1
+         80.2691 |          60.2082  cm-1
+         80.2691 |          64.3616  cm-1
+         80.2691 |          64.3616  cm-1
+         80.2691 |          64.3616  cm-1
+         80.2691 |          76.8430  cm-1
+         99.2432 |          76.8430  cm-1
+         99.2432 |          76.8430  cm-1
+         99.2432 |          76.8430  cm-1
+         99.2432 |          99.4508  cm-1
+        101.7456 |          99.4508  cm-1
+        101.7456 |          99.4508  cm-1
+        101.7456 |          99.4508  cm-1
+        179.9445 |         101.9649  cm-1
+        179.9445 |         101.9649  cm-1
+        179.9445 |         101.9649  cm-1
+        179.9445 |         101.9649  cm-1
+        179.9445 |         101.9649  cm-1
+        179.9445 |         101.9649  cm-1
+        186.1459 |         136.6898  cm-1
+        186.1459 |         136.6898  cm-1
+        186.1459 |         136.6898  cm-1
+        187.8042 |         143.2382  cm-1
+        187.8042 |         143.2382  cm-1
+        187.8042 |         143.2382  cm-1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Congratulations!">Congratulations!<a class="anchor-link" href="#Congratulations!">&#182;</a></h2><p>You performed your first SSCHA relaxation! 
+However, we still are not done. Most likely, the SSCHA stopped when the original ensemble was wasted.
+This means that that ensemble is no more significative to describe the new density matrix. 
+We should extract with the last dynamical matrix a new ensemble, compute energies and forces and then minimize again.
+This procedure should iterated until convergence is obtained.</p>
+<p>There are many ways, you can manually iterate the ensemble generation, simply rerunning the cell of this notebook (but loading the new dynamical matrix we saved as dyn<em>pop1</em>).
+However, the SSCHA code offers a module (Relax) that can automatize these iterations for you.
+Indeed, in this case, you need to setup an automatic calculator with ASE, locally or with the cluster option.</p>
+<p>You can go to the next tutorials.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+ 
+
