@@ -23,7 +23,7 @@ website.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Preparation">Preparation<a class="anchor-link" href="#Preparation">&#182;</a></h2><p>Both ASE and the SSCHA work in python, so we need to import them.
+<h2 id="Preparation">Preparation</h2><p>Both ASE and the SSCHA work in python, so we need to import them.
 Moreover, since we want to use quantum-espresso, we also import the Espresso calculation of ASE.
 This can be replaced your favorite calculator.</p>
 
@@ -286,7 +286,7 @@ especially for the variable cell relaxation, where the pressure is computed. Her
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Harmonic-calculation">Harmonic calculation<a class="anchor-link" href="#Harmonic-calculation">&#182;</a></h3><p>Now we need to perform an harmonic calculation to get the spectra.
+<h3 id="Harmonic-calculation">Harmonic calculation</h3><p>Now we need to perform an harmonic calculation to get the spectra.
 This can be done with perturbation theory with quantum espresso, 
 or with phonopy if we want to use the finite displacement approach.</p>
 <p>I will show a very simple PDFT espresso run.
@@ -463,7 +463,7 @@ How is this possible? It is anharmonicity and quantum zero-point motion that sta
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="The-Self-Consistent-Harmonic-Approximation">The Self-Consistent Harmonic Approximation<a class="anchor-link" href="#The-Self-Consistent-Harmonic-Approximation">&#182;</a></h1><p>Now we have all the ingredients to start a SSCHA calculation.
+<h1 id="The-Self-Consistent-Harmonic-Approximation">The Self-Consistent Harmonic Approximation</h1><p>Now we have all the ingredients to start a SSCHA calculation.
 The SSCHA finds the optimal gaussian density matrix that minimizes the free energy of the system:
 $$
 \rho_{\mathcal R, \Upsilon}(\vec R) = \sqrt{\det(\Upsilon / 2\pi)} \exp \left[ -\frac 12 \sum_{\alpha\beta} (R_\alpha - \mathcal{R}_\alpha)\Upsilon_{\alpha\beta}(R_\beta - \mathcal{R}_\beta)\right]
@@ -476,7 +476,7 @@ an auxiliary harmonic hamiltonian $\mathcal H_{\mathcal R, \Upsilon}$.
 $$
 \rho_{\mathcal R, \Upsilon} \longleftrightarrow \mathcal H_{\mathcal R, \Upsilon}
 $$</p>
-<h2 id="Preparation-of-the-data">Preparation of the data<a class="anchor-link" href="#Preparation-of-the-data">&#182;</a></h2><p>First, we need to obtain a good starting point for our density matrix $\rho$.
+<h2 id="Preparation-of-the-data">Preparation of the data</h2><p>First, we need to obtain a good starting point for our density matrix $\rho$.
 We can use the harmonic dynamical matrix we computed on the previous step (harmnic_dyn).</p>
 <p>There is a problem: an harmonic hamiltonian must be positive definite to generate a density matrix, 
 and the PbTe harmonic hamiltonian is not.
@@ -578,7 +578,7 @@ Do not worry, the CellConstructor has a nice tool to force a dynamical matrix to
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As you can see, we eliminated the imaginary frquencies. This is no more the harmonic dynamical matrix, however it is a good starting point for defining the density matrix $\rho_{\mathcal R, \Upsilon}(R)$.</p>
-<h2 id="The-stochastic-approach">The stochastic approach<a class="anchor-link" href="#The-stochastic-approach">&#182;</a></h2><p>To solve the self-consistent harmonic approximation we use a stochastic approach: we generate random ionic configurations distributed according to $\rho_{\mathcal R, \Upsilon}$ so that we can compute the free energy as
+<h2 id="The-stochastic-approach">The stochastic approach</h2><p>To solve the self-consistent harmonic approximation we use a stochastic approach: we generate random ionic configurations distributed according to $\rho_{\mathcal R, \Upsilon}$ so that we can compute the free energy as
 $$
 F_{\mathcal R, \Upsilon} = F[{\mathcal H}_{\mathcal R, \Upsilon}] + \left&lt;V(R) - \mathcal V(R)\right&gt;_{\rho_{\mathcal R, \Upsilon}}
 $$</p>
@@ -618,7 +618,7 @@ $V(R)$ is the BO energy landscape, $\mathcal V(R)$ is the harmonic potential of 
 You can save the ensemble as text files with the atomic coordinates and cell in this way and use your own scripts to copy that on a cluster, setup your DFT calculation, parse the output files and copy them back here, or you can pass to the ensemble class the ASE calculator object, and it will compute automatically energy and forces.
 It is also possible to configure a cluster for a remote calculation so that the code will automatize anything.
 In the following subsections I will follow all the possibilities, you can jump directly to the section you are more interested in.</p>
-<h3 id="The-ASE-automatic-calculation-(local)">The ASE automatic calculation (local)<a class="anchor-link" href="#The-ASE-automatic-calculation-(local)">&#182;</a></h3><p>We start with the easiest possible thing. We already performed the calculation using ASE for the cell relaxation, we will setup it
+<h3 id="The-ASE-automatic-calculation-(local)">The ASE automatic calculation (local)</h3><p>We start with the easiest possible thing. We already performed the calculation using ASE for the cell relaxation, we will setup it
 now for a simple total energy DFT calculation, attach to our ensemble variable and compute the ensemble.</p>
 <p><strong>NOTE</strong>: Sometimes calculators can fails randomly, therefore, the ensemble will automatically resubmit a calculation if it fails for 5 times. If 5 consecutive fails are found, then the calculation results in a crash.</p>
 
@@ -689,7 +689,7 @@ conf 9 / 10
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="The-manual-calculation-(local-or-on-a-cluster)">The manual calculation (local or on a cluster)<a class="anchor-link" href="#The-manual-calculation-(local-or-on-a-cluster)">&#182;</a></h3><p>Here we print on separated text file the atomic positions and the cell.
+<h3 id="The-manual-calculation-(local-or-on-a-cluster)">The manual calculation (local or on a cluster)</h3><p>Here we print on separated text file the atomic positions and the cell.
 We then need to parse with a script the ensemble to generate an input file for our favourite calculator, submit the calculation (it can be done on a cluster), and then parse the output files to obtain forces, energies and the stress tensors.</p>
 <p>I will present an example for quantum espresso, however, you can easily implement your scripts to work with your own code.</p>
 
@@ -991,7 +991,7 @@ This time, when we load the ensemble, we need also to specify the number of conf
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="The-automatic-submission-to-a-cluster">The automatic submission to a cluster<a class="anchor-link" href="#The-automatic-submission-to-a-cluster">&#182;</a></h3><p>The python-sscha code implements also the possibility send the calculation to a remote cluster.
+<h3 id="The-automatic-submission-to-a-cluster">The automatic submission to a cluster</h3><p>The python-sscha code implements also the possibility send the calculation to a remote cluster.
 This option is really usefull, as installing the full sscha package on a cluster may be cumbersome.</p>
 <p>With this option we will run all the SSCHA locally, and submit to the cluster only the DFT calculations.
 This option is compatible with queue systems as SLURM and PBS.</p>
@@ -1101,7 +1101,7 @@ In this case, you can specify the pwd in the cluster initialization:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="The-SSCHA-minimization">The SSCHA minimization<a class="anchor-link" href="#The-SSCHA-minimization">&#182;</a></h1><p>In the previous section we initialized the starting density matrix $\rho_{\mathcal R,\Upsilon}$, 
+<h1 id="The-SSCHA-minimization">The SSCHA minimization</h1><p>In the previous section we initialized the starting density matrix $\rho_{\mathcal R,\Upsilon}$, 
 and we generated a randomly distributed ensemble. Then we used quantum-espresso to compute the energies, forces and the stress from it.</p>
 <p>In this section we will use the extracted ensemble to optimize the density matrix $\rho_{\mathcal R, \Upsilon}$ in order to minimize the free energy.
 The minimization will continue until both we converge to a minimum, or our ensemble degradates.
@@ -1284,7 +1284,7 @@ The stocastic error of the free energy instead, was: 8.731060497873162e-05  Ry
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Saving-the-results">Saving the results<a class="anchor-link" href="#Saving-the-results">&#182;</a></h2><p>We completed the minimization, now we can save the final results.
+<h2 id="Saving-the-results">Saving the results</h2><p>We completed the minimization, now we can save the final results.
 In particular we can save the density matrix $\rho_{\mathcal R, \Upsilon}$. The important quantities are the average atomic positions,
 and the covariance matrix.</p>
 <p>These two quantities are both stored inside the auxiliary dynamical matrix. We can access it through:</p>
@@ -1389,7 +1389,7 @@ and the covariance matrix.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Congratulations!">Congratulations!<a class="anchor-link" href="#Congratulations!">&#182;</a></h2><p>You performed your first SSCHA relaxation! 
+<h2 id="Congratulations!">Congratulations!</h2><p>You performed your first SSCHA relaxation! 
 However, we still are not done. Most likely, the SSCHA stopped when the original ensemble was wasted.
 This means that that ensemble is no more significative to describe the new density matrix. 
 We should extract with the last dynamical matrix a new ensemble, compute energies and forces and then minimize again.
