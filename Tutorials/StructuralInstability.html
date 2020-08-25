@@ -1,0 +1,134 @@
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">pylab</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Using matplotlib backend: Qt5Agg
+Populating the interactive namespace from numpy and matplotlib
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Second-order-phase-transitions-and-structural-instabilities">Second order phase transitions and structural instabilities<a class="anchor-link" href="#Second-order-phase-transitions-and-structural-instabilities">&#182;</a></h1><p>One of the main big features of the self-consistent harmonic approximation (SCHA) is that it provides a complete theoretical framework to study second order phase-transitions for structural instabilities.
+Examples are charge density wave, ferroelectric materials or structural deformation.
+An example application for each one of this case is reported, carried out with the SSCHA package:</p>
+<ol>
+<li><a href="https://pubs.acs.org/doi/abs/10.1021/acs.nanolett.9b00504">Bianco et. al. Nano Lett. 2019, 19, 5, 3098-3103</a></li>
+<li><a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.122.075901">Aseguinolaza et. al. Phys. Rev. Lett. 122, 075901</a></li>
+<li><a href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.97.214101">Bianco et. al. Phys. Rev. B 97, 214101</a></li>
+</ol>
+<p>According to the Landau theory of second order phase transitions, a phase transition occurs when the free energy curvature around the high-symmetry structure on the direction of the order parameter becomes negative:
+<img src="second_order.png" alt=""></p>
+<p>For structural phase transitions, the order parameter is associated to phonon atomic displacements. So we just need to calculate the Free energy Hessian, as:
+$$
+\frac{\partial^2 F}{\partial R_a \partial R_b} 
+$$</p>
+<p>here, $a$ and $b$ encodes both atomic and cartesian coordinates.
+This quantity is very hard to compute with a finite difference approach, as it would require a SSCHA calculation for all possible atomic displacements (keeping atoms fixed), and the Free energy is affected by stochastic noise. Luckily, SSCHA provides an analitical equation for the free energy hessian, derived by Raffaello Bianco in the work <a href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.96.014111">Bianco et. al. Phys. Rev. B 96, 014111</a>.
+The free energy curvature can be writte in matrical form as:
+$$
+\frac{\partial^2 F}{\partial {R_a}\partial {R_b}} = \Phi_{ab} + \sum_{cdef} \stackrel{(3)}{\Phi}_{acd}[1 - \Lambda\stackrel{(4)}{\Phi}]^{-1}_{cdef} \stackrel{(3)}{\Phi}_{efb}
+$$</p>
+<p>Here, $\Phi$ is the SCHA force constant matrix obtained by the auxiliary harmonic hamiltonian, $\stackrel{(3,4)}{\Phi}$ are the average of the 3rd and 4th derivative of the Born-Oppenheimer energy landscape on the SCHA density matrix, while the $\Lambda$ tensor is a function of the frequencies of the auxiliary harmonic hamiltonian.</p>
+<p>Fortunately, this complex equation can be evaluated from the ensemble with a simple function call:</p>
+<div class="highlight"><pre><span></span><span class="n">ensemble</span><span class="o">.</span><span class="n">get_free_energy_hessian</span><span class="p">()</span>
+</pre></div>
+<p>Lets see a practical example:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Lets import all the sscha modules</span>
+<span class="kn">import</span> <span class="nn">cellconstructor</span> <span class="k">as</span> <span class="nn">CC</span>
+<span class="kn">import</span> <span class="nn">cellconstructor.Phonons</span>
+<span class="kn">import</span> <span class="nn">sscha</span><span class="o">,</span> <span class="nn">sscha.Ensemble</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># We load the SSCHA dynamical matrix for the PbTe (the one after convergence)</span>
+<span class="n">dyn_sscha</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">Phonons</span><span class="o">.</span><span class="n">Phonons</span><span class="p">(</span><span class="s2">&quot;dyn_sscha&quot;</span><span class="p">,</span> <span class="n">nqirr</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Now we load the ensemble</span>
+<span class="n">ensemble</span> <span class="o">=</span> <span class="n">sscha</span><span class="o">.</span><span class="n">Ensemble</span><span class="o">.</span><span class="n">Ensemble</span><span class="p">(</span><span class="n">dyn_sscha</span><span class="p">,</span> <span class="n">T0</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">supercell</span><span class="o">=</span><span class="n">dyn_sscha</span><span class="o">.</span><span class="n">GetSupercell</span><span class="p">())</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data_ensemble_final&quot;</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">population</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># If the sscha matrix was not the one used to compute the ensemble</span>
+<span class="c1"># We must update the ensemble weights</span>
+<span class="c1"># We can also use this function to simulate a different temperature.</span>
+<span class="n">ensemble</span><span class="o">.</span><span class="n">update_weights</span><span class="p">(</span><span class="n">dyn_sscha</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># ----------- COMPUTE THE FREE ENERGY HESSIAN -----------</span>
+<span class="n">dyn_hessian</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">get_free_energy_hessian</span><span class="p">()</span>
+<span class="c1"># -------------------------------------------------------</span>
+
+<span class="c1"># We can save the free energy hessian as a dynamical matrix in quantum espresso format</span>
+<span class="n">dyn_hessian</span><span class="o">.</span><span class="n">save_qe</span><span class="p">(</span><span class="s2">&quot;free_energy_hessian&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This code will do the trick. We can then print the frequencies of the hessian. If an imaginary frequency is present, then the system wants to spontaneosly break the high symmetry phase.</p>
+<p>The frequencies in the free energy hessian are temperature dependent.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+ 
+
