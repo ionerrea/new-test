@@ -161,7 +161,7 @@ Populating the interactive namespace from numpy and matplotlib
 This is good for visualization purposes, but it makes calculations harder, as more atoms are present in the cell.
 So we redefine the new cell unsing cellconstructor to adapt system in the primitive cell.
 From an easy check on the structure, it is possible to recognize that the primitive vectors \(\vec{v'}\) 
-can be obtained from the conventional vectors $v$ as follows:</p>
+can be obtained from the conventional vectors \(v\) as follows:</p>
 $$
 \vec {v'}_1 = \frac 12 \left(\vec v_1 + \vec v_2\right)
 $$$$
@@ -468,15 +468,15 @@ The SSCHA finds the optimal gaussian density matrix that minimizes the free ener
 $$
 \rho_{\mathcal R, \Upsilon}(\vec R) = \sqrt{\det(\Upsilon / 2\pi)} \exp \left[ -\frac 12 \sum_{\alpha\beta} (R_\alpha - \mathcal{R}_\alpha)\Upsilon_{\alpha\beta}(R_\beta - \mathcal{R}_\beta)\right]
 $$
-where $\mathcal{R}$ and $\Upsilon$ are, respectively, the average centroid position and the 
-covariance matrix of the gaussian, while $\alpha,\beta=1\cdots 3N$ rum on both the atomic and the cartesian coordinates.</p>
-<p>In the specific case, the $\rho_{\mathcal R, \Upsilon}(\vec R)$ density matrix can be represented by a positive definite dynamical matrix.
+where \(\mathcal{R}\) and \(\Upsilon\) are, respectively, the average centroid position and the 
+covariance matrix of the gaussian, while \(\alpha,\beta=1\cdots 3N\) rum on both the atomic and the cartesian coordinates.</p>
+<p>In the specific case, the \(\rho_{\mathcal R, \Upsilon}(\vec R)\) density matrix can be represented by a positive definite dynamical matrix.
 In fact, the equilibrium density matrix of any harmnic Hamiltonian is a gaussian. Our density matrix is related one to one to
-an auxiliary harmonic hamiltonian $\mathcal H_{\mathcal R, \Upsilon}$.
+an auxiliary harmonic hamiltonian \(\mathcal H_{\mathcal R, \Upsilon}\).
 $$
 \rho_{\mathcal R, \Upsilon} \longleftrightarrow \mathcal H_{\mathcal R, \Upsilon}
 $$</p>
-<h2 id="Preparation-of-the-data">Preparation of the data</h2><p>First, we need to obtain a good starting point for our density matrix $\rho$.
+<h2 id="Preparation-of-the-data">Preparation of the data</h2><p>First, we need to obtain a good starting point for our density matrix \(\rho\).
 We can use the harmonic dynamical matrix we computed on the previous step (harmnic_dyn).</p>
 <p>There is a problem: an harmonic hamiltonian must be positive definite to generate a density matrix, 
 and the PbTe harmonic hamiltonian is not.
@@ -577,13 +577,13 @@ Do not worry, the CellConstructor has a nice tool to force a dynamical matrix to
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As you can see, we eliminated the imaginary frquencies. This is no more the harmonic dynamical matrix, however it is a good starting point for defining the density matrix $\rho_{\mathcal R, \Upsilon}(R)$.</p>
-<h2 id="The-stochastic-approach">The stochastic approach</h2><p>To solve the self-consistent harmonic approximation we use a stochastic approach: we generate random ionic configurations distributed according to $\rho_{\mathcal R, \Upsilon}$ so that we can compute the free energy as
+<p>As you can see, we eliminated the imaginary frquencies. This is no more the harmonic dynamical matrix, however it is a good starting point for defining the density matrix \(\rho_{\mathcal R, \Upsilon}(R)\).</p>
+<h2 id="The-stochastic-approach">The stochastic approach</h2><p>To solve the self-consistent harmonic approximation we use a stochastic approach: we generate random ionic configurations distributed according to \(\rho_{\mathcal R, \Upsilon}\) so that we can compute the free energy as
 $$
 F_{\mathcal R, \Upsilon} = F[{\mathcal H}_{\mathcal R, \Upsilon}] + \left&lt;V(R) - \mathcal V(R)\right&gt;_{\rho_{\mathcal R, \Upsilon}}
 $$</p>
-<p>Here $F[\mathcal H_{\mathcal R, \Upsilon}]$ is the free energy of the auxiliary harmonic hamiltonian $\mathcal H_{\mathcal R, \Upsilon}$, 
-$V(R)$ is the BO energy landscape, $\mathcal V(R)$ is the harmonic potential of the auxiliary hamiltonian $\mathcal H_{\mathcal R, \Upsilon}$ and $\left&lt;\cdot\right&gt;_{\rho_{\mathcal R, \Upsilon}}$ is the average over the $\rho_{\mathcal R, \Upsilon}$ density matrix.</p>
+<p>Here \(F[\mathcal H_{\mathcal R, \Upsilon}]\) is the free energy of the auxiliary harmonic hamiltonian \(\mathcal H_{\mathcal R, \Upsilon}\), 
+\(V(R)\) is the BO energy landscape, \(\mathcal V(R)\) is the harmonic potential of the auxiliary hamiltonian \(\mathcal H_{\mathcal R, \Upsilon}\) and \(\left&lt;\cdot\right&gt;_{\rho_{\mathcal R, \Upsilon}}\) is the average over the \(\rho_{\mathcal R, \Upsilon}\) density matrix.</p>
 <p>So we need to generate the random ensemble.</p>
 
 </div>
@@ -613,7 +613,7 @@ $V(R)$ is the BO energy landscape, $\mathcal V(R)$ is the harmonic potential of 
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We need to compute the quantity $V(R)$ (the energy) and its gradient (the atomic forces) for each configuration.</p>
+<p>We need to compute the quantity \(V(R)\) (the energy) and its gradient (the atomic forces) for each configuration.</p>
 <p>This can be done in many ways. You can do it manually:
 You can save the ensemble as text files with the atomic coordinates and cell in this way and use your own scripts to copy that on a cluster, setup your DFT calculation, parse the output files and copy them back here, or you can pass to the ensemble class the ASE calculator object, and it will compute automatically energy and forces.
 It is also possible to configure a cluster for a remote calculation so that the code will automatize anything.
@@ -1101,13 +1101,13 @@ In this case, you can specify the pwd in the cluster initialization:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="The-SSCHA-minimization">The SSCHA minimization</h1><p>In the previous section we initialized the starting density matrix $\rho_{\mathcal R,\Upsilon}$, 
+<h1 id="The-SSCHA-minimization">The SSCHA minimization</h1><p>In the previous section we initialized the starting density matrix \(\rho_{\mathcal R,\Upsilon}\), 
 and we generated a randomly distributed ensemble. Then we used quantum-espresso to compute the energies, forces and the stress from it.</p>
-<p>In this section we will use the extracted ensemble to optimize the density matrix $\rho_{\mathcal R, \Upsilon}$ in order to minimize the free energy.
+<p>In this section we will use the extracted ensemble to optimize the density matrix \(\rho_{\mathcal R, \Upsilon}\) in order to minimize the free energy.
 The minimization will continue until both we converge to a minimum, or our ensemble degradates.
-Ensemble degradation occurs when our updated parameters $\mathcal R$ and $\Upsilon$ changes a lot with respect to the original value used to generate the ensemble.</p>
-<p>In this case the $\mathcal R$ are fixed by symmetry, so our only degrees of freedom are in the $\Upsilon$ matrix.
-therefore we force the system to ignore $\mathcal R$ for the minimization convergence.</p>
+Ensemble degradation occurs when our updated parameters \(\mathcal R\) and \(\Upsilon\) changes a lot with respect to the original value used to generate the ensemble.</p>
+<p>In this case the \(\mathcal R\) are fixed by symmetry, so our only degrees of freedom are in the \(\Upsilon\) matrix.
+therefore we force the system to ignore \(\mathcal R\) for the minimization convergence.</p>
 
 </div>
 </div>
@@ -1169,8 +1169,8 @@ However, after it finishes, you can plot the major features to have a hint of wh
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Here you see several plots as a function of the minimization steps. 
 The first one is the total Free energy (including anharmonic contributions) 
-The second plot is the modulus of the free energy gradient with respect to the covariance $\Upsilon$ matrix. 
-The third plot is the modulus of the free energy gradient with respect to the average atomic position $\mathcal R$.
+The second plot is the modulus of the free energy gradient with respect to the covariance \(\Upsilon\) matrix. 
+The third plot is the modulus of the free energy gradient with respect to the average atomic position \(\mathcal R\).
 The final plot is a measurement of the ensemble degradance.
 You can notice that the gradient of the atomic position is always 0, this reflects the fact that the average position of the atoms must keep the
 frequencies.</p>
@@ -1285,7 +1285,7 @@ The stocastic error of the free energy instead, was: 8.731060497873162e-05  Ry
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Saving-the-results">Saving the results</h2><p>We completed the minimization, now we can save the final results.
-In particular we can save the density matrix $\rho_{\mathcal R, \Upsilon}$. The important quantities are the average atomic positions,
+In particular we can save the density matrix \(\rho_{\mathcal R, \Upsilon}\). The important quantities are the average atomic positions,
 and the covariance matrix.</p>
 <p>These two quantities are both stored inside the auxiliary dynamical matrix. We can access it through:</p>
 <div class="highlight"><pre><span></span><span class="n">minimizer</span><span class="o">.</span><span class="n">dyn</span>
