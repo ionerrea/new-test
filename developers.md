@@ -4,9 +4,10 @@ title: Developers
 ---
 
 
-[![Ion Errea](img/Ion_Errea.jpg)](https://ionerrea.wordpress.com/) [**Ion Errea**](https://ionerrea.wordpress.com/) – University of the Basque Country (UPV/EHU), Donostia/San Sebastián, Spain
+[![Ion Errea](img/Ion_Errea.jpg)](https://ionerrea.wordpress.com/) [**Ion Errea**](https://ionerrea.wordpress.com/) – University of the Basque Country, San Sebastian, Spain
 
-> **Topics:** New results in ML: Mapping over-parameterized fixed-depth deep neural networks to Gaussian Processes. The Neural Tangent Kernel. Field theory description of over-parametrized networks. The information bottleneck. Identifying slow degrees of freedom, learning Exact Holomorphic Mappings in ADS/CFT.
+> Professor at the University of the Basque Country (UPV/EHU), leader of the *Quantum Theory of Materials* group at the [*Materials Physics Center*](https://cfm.ehu.es/eu/), and associated researcher at the [*Donostia International Physics Center*](http://dipc.ehu.es/index.php) .
+>**e-mail:** ion.errea@ehu.eus
 
  
 [![Lei Wang](img/lei.jpg)](http://wangleiphy.github.io/) [**Lei Wang**](http://wangleiphy.github.io/) – Institute of Physics, Chinese Academy of Sciences, China 
