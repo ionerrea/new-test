@@ -3,10 +3,16 @@ layout: page
 title: Developers
 ---
 
+[![Raffaello Bianco](img/Raffaello_Bianco.jpg)](https://scholar.google.com/citations?user=YtXgXCAAAAAJ&hl=it) [**Raffaello Bianco**](https://scholar.google.com/citations?user=YtXgXCAAAAAJ&hl=it) – Materials Physics Center, San Sebastian, Spain
+
+> Postdoctoral researcher at the [*Materials Physics Center*](https://cfm.ehu.es/eu/) .
+>
+>**e-mail:** raffaello.bianco@ehu.eus
 
 [![Ion Errea](img/Ion_Errea.jpg)](https://ionerrea.wordpress.com/) [**Ion Errea**](https://ionerrea.wordpress.com/) – University of the Basque Country, San Sebastian, Spain
 
 > Professor at the University of the Basque Country (UPV/EHU), leader of the *Quantum Theory of Materials* group at the [*Materials Physics Center*](https://cfm.ehu.es/eu/), and associated researcher at the [*Donostia International Physics Center*](http://dipc.ehu.es/index.php) .
+>
 >**e-mail:** ion.errea@ehu.eus
 
  
