@@ -6,11 +6,10 @@ title: References and how to cite
 The SSCHA program is described in details in the following publication:
 - *The Stochastic Self-Consistent Harmonic Approximation:  a Modular Python Package for Calculating Vibrational Properties of Materials with Full Quantum and Anharmonic Effects*. 
   Lorenzo Monacelli, Raffaello Bianco, Matteo Calandra, Ion Errea, and Francesco Mauri.
-  blablabla
-  
+  blablabla  
 If you use any part of the SSCHA code, you should cite it in your publications.
 
-As the theory of the SSCHA work has been previously published, we would also kindly ask you to cite the following papers that develop the SSHCA theory in all works making use of the SSCHA code:
+As the theory of the SSCHA work has been previously published, we would also kindly ask you to cite the following papers that develop the SSHCA theory in all works making use of it:
 - [*Anharmonic free energies and phonon dispersions from the stochastic self-consistent harmonic approximation: Application to platinum and palladium hydrides*](https://journals.aps.org/prb/abstract/10.1103/PhysRevB.89.064302). 
   Ion Errea, Matteo Calandra, and Francesco Mauri. 
   Physical Review B 89, 064302 (2014). 
