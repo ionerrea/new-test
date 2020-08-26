@@ -30,7 +30,7 @@ navbar-links:
     - Sulfur hydride: "/Tutorials/Automatic_Calculations"
     - Lanthanum hydride: "/Tutorials/VariableCellRelaxation"
   Faqs: "faqs"
-  User guide: "/userguide/index1"
+  Documentation: "documentation"
   References and how to cite: "references"
   Developers: "developers"
   Contact: "contact"
