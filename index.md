@@ -10,4 +10,4 @@ If you are simulating transport or thermal properties of materials, phase diagra
 
 The SSCHA comes both as a python library that can be runned inside your own workflows and as a stand-alone software, which is initialized by input files with the same syntax as Quantum ESPRESSO. It can be coupled with any *ab initio* engine for force and energy calculations, or it can also be used with force fields. It can interact through the Atomic Simulation Environment (ASE), and has an implemented interface for automatic submission of jobs in a remote cluster.
 
-In this website you can find the instructions to install the code and Tutorials that will help you understand how to use it.
+In this website you can find the instructions to [install](download) the code and [tutorials](tutorial) that will help you understand how to use it.
