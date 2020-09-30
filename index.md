@@ -2,7 +2,7 @@
 layout: page
 ---
 
-![A test image](img/SSCHA_Logo_original_bertikala.png)
+![A test image](img/SSCHA_Logo_original_horizontala.png)
 
 The stochastic self-consistent harmonic approximation (SSCHA) is a full computational python package that simulates thermodynamic and phononic properties of materials accounting for anharmonicity at a nonperturbative level that  fully including quantum and thermal fluctuations.
 
