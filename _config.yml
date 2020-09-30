@@ -42,7 +42,7 @@ navbar-links:
 
 # If you want to have an image logo in the top-left corner instead of the title text,
 # then specify the following parameter
-title-img: /img/SSCHA_bertsio_laburtua_rrss.png
+title-img: "/new-test/img/SSCHA_bertsio_laburtua_rrss.png"
 
 # --- Background colour/image options --- #
 
